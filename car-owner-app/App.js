@@ -1,28 +1,28 @@
-import { StatusBar } from 'expo-status-bar'
-import { SafeAreaView, StyleSheet } from 'react-native'
-
-import VehicleManagement from './view/vehicle/VehicleManagement'
-
-
+import { StatusBar } from "expo-status-bar";
+import { SafeAreaView, StyleSheet, Text, View } from "react-native";
+import { useEffect } from "react";
+import { getVehicles } from "./repository/vehicle/vehicleDBActions";
+import VehicleManagement from "./view/vehicle/VehicleManagement";
 
 export default function App() {
+  useEffect(() => {
+    getVehicles();
+  }, []);
+
   return (
-    <SafeAreaView style={styles.safe_container}>
+    <View style={styles.container}>
+      <Text>Open up App.js to start working on your app!</Text>
       <StatusBar style="auto" />
       <VehicleManagement />
-    </SafeAreaView>
-  )
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-
-  /* CONTAINER */
-  safe_container: { flex: 1 },
-
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
-})
+});

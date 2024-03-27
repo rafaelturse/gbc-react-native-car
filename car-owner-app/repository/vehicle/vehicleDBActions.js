@@ -1,31 +1,21 @@
-import { useState } from "react"
+import { useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import db from "../../FirebaseDB";
 
-//import { initializeApp } from "firebase/app"
-import { getFirestore } from "firebase/firestore"
-import { db } from "../../config/firebase-keys"
-import { collection, getDocs, query, where } from "firebase/firestore"
-
-//const app = initializeApp(firebaseConfig)
-
-export const getAll = async () => {
-    try {
-        console.log(`>>> INFO: get all vehicles process start`)
-
-        const querySnapshot = await getDocs(collection(db, "vehicles"))
-
-        const resultsFromFirestore = []
-
-        querySnapshot.forEach((doc) => {
-            console.log(doc.id, " => ", doc.data())
-            const itemToAdd = {
-                id: doc.id,
-                ...doc.data()
-            }
-            resultsFromFirestore.push(itemToAdd)
-        })
-
-        console.log(`>>> INFO: get content: ${resultsFromFirestore}`)
-
-        return resultsFromFirestore
-    } catch (err) { console.log(err) }
-}
+export const getVehicles = async () => {
+  let vehicles = [];
+  try {
+    const response = await getDocs(collection(db, "vehicles"));
+    if (!response.empty) {
+      response.forEach((doc) => {
+        vehicles.push(doc.data());
+        console.log(`${doc.id} => ${doc.data().name}`);
+      });
+      return vehicles;
+    } else {
+      console.log("No such document!");
+    }
+  } catch (error) {
+    console.error("Error fetching document: ", error);
+  }
+};
