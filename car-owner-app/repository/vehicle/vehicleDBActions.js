@@ -5,7 +5,6 @@ import { getFirestore } from "firebase/firestore"
 import { db } from "../../config/firebase-keys"
 import { collection, getDocs, query, where } from "firebase/firestore"
 
-
 const app = initializeApp(firebaseConfig)
 
 const db = getFirestore(app)
