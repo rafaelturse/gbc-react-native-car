@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react"
 
-import { SafeAreaView, View, StyleSheet } from 'react-native'
+import { SafeAreaView, View, StyleSheet, Text } from 'react-native'
 
 const VehicleManagement = () => {
     return (
-        <SafeAreaView style={styles.safe_container}>
-            <View style={styles.container}>
-
-            </View>
-        </SafeAreaView>
+        <View style={styles.line_container}>
+            <Text>Open up App.js to start working on your app!</Text>
+        </View>
     )
 }
 
@@ -16,13 +14,10 @@ const styles = StyleSheet.create({
 
     /* COLORS */
 
-    /* CONTAINER */
-    safe_container: { flex: 1 },
-
     line_container: {
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
 })
 
-export default VehicleManagement()
+export default VehicleManagement
