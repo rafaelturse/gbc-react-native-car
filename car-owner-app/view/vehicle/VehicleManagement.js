@@ -1,28 +1,34 @@
-import { useState, useEffect } from "react"
-
-import { SafeAreaView, View, StyleSheet } from 'react-native'
+import { useState, useEffect } from "react";
+import { View, StyleSheet, FlatList, Text, Button } from "react-native";
+import { getVehicles } from "../../repository/vehicle/vehicleDBActions";
 
 const VehicleManagement = () => {
-    return (
-        <SafeAreaView style={styles.safe_container}>
-            <View style={styles.container}>
+  const [vehicles, setVehicles] = useState([]);
 
-            </View>
-        </SafeAreaView>
-    )
-}
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      const vehiclesData = await getVehicles();
+      setVehicles(vehiclesData);
+    };
+    fetchVehicles();
+  }, []);
+
+  const renderVehicleItem = ({ item }) => (
+    <Text style={styles.vehicleItem}>{item.name}</Text>
+  );
+
+  return (
+    <View>
+      <FlatList data={vehicles} renderItem={renderVehicleItem} />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
+  line_container: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+});
 
-    /* COLORS */
-
-    /* CONTAINER */
-    safe_container: { flex: 1 },
-
-    line_container: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-    },
-})
-
-export default VehicleManagement()
+export default VehicleManagement;
