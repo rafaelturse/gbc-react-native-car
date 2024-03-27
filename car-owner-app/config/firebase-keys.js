@@ -1,12 +1,17 @@
 import { initializeApp } from "firebase/app"
+import { getFirestore } from "firebase/firestore"
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBpq19EzvjAty99xJe3jBQAZ2MIVHOG7y4",
-    authDomain: "gbc-react-native-car.firebaseapp.com",
-    projectId: "gbc-react-native-car",
-    storageBucket: "gbc-react-native-car.appspot.com",
-    messagingSenderId: "96220454703",
-    appId: "1:96220454703:web:880cc1061de9e20064cbda"
+    apiKey: "AIzaSyBV2V0kZ-PuxZoK32bdI1eYeKrkRVQSDDk",
+    authDomain: "gbc-react-native.firebaseapp.com",
+    projectId: "gbc-react-native",
+    storageBucket: "gbc-react-native.appspot.com",
+    messagingSenderId: "1744968402",
+    appId: "1:1744968402:web:feaeeb5431eeea87d32b0b"
 }
 
 const app = initializeApp(firebaseConfig)
+
+const db = getFirestore(app)
+
+export { db }
