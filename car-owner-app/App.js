@@ -1,7 +1,6 @@
 import { StatusBar } from 'expo-status-bar'
 import { StyleSheet, Text, View } from 'react-native'
 
-import VehicleManagement from './view/vehicle/vehicleManagement'
 
 export default function App() {
   return (
@@ -9,7 +8,6 @@ export default function App() {
       <Text>Open up App.js to start working on your app!</Text>
       <StatusBar style="auto" />
 
-      <VehicleManagement />
     </View>
   );
 }
