@@ -1,6 +1,5 @@
-import { useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
-import db from "../../FirebaseDB";
+import db from "../FirebaseDB";
 
 export const getVehicles = async () => {
   let vehicles = [];

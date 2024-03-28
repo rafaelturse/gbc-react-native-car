@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { View, StyleSheet, FlatList, Text, Button } from "react-native";
-import { getVehicles } from "../../repository/vehicle/vehicleDBActions";
+import { View, StyleSheet, FlatList, Text } from "react-native";
+import { getVehicles } from "../vehicleDBActions";
 
 const VehicleManagement = () => {
   const [vehicles, setVehicles] = useState([]);
