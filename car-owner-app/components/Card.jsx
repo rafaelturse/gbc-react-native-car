@@ -1,8 +1,12 @@
 import React from "react";
 import { View, Text, Image, StyleSheet, Pressable } from "react-native";
 import Carousel from "./Carousel";
+import StyledButton from "./StyledButton";
+import { useNavigation } from "@react-navigation/native";
 
 const Card = ({ vehicle }) => {
+  const pilot = useNavigation();
+
   return (
     <View style={styles.card}>
       <Carousel images={vehicle.images} />
@@ -28,9 +32,10 @@ const Card = ({ vehicle }) => {
             >{`Acceleration: ${vehicle.acceleration}`}</Text>
           </View>
         </View>
-        <Pressable style={styles.button}>
-          <Text style={styles.buttonText}>Select</Text>
-        </Pressable>
+        <StyledButton
+          text="Select"
+          action={() => pilot.navigate("Form", vehicle)}
+        />
       </View>
     </View>
   );
@@ -41,7 +46,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 10,
     marginBottom: 30,
-    marginHorizontal: 20,
+    marginHorizontal: 10,
     shadowColor: "#284b63",
     shadowOffset: {
       width: 5,
@@ -86,30 +91,12 @@ const styles = StyleSheet.create({
   row: {
     display: "flex",
     flexDirection: "row",
+    marginBottom: 10,
   },
   column: {
     display: "flex",
     flexDirection: "column",
     flex: 1,
-  },
-  button: {
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    marginVertical: 10,
-    shadowColor: "#284b63",
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    borderWidth: 1,
-    borderColor: "#284b63",
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-    textAlign: "center",
   },
 });
 
