@@ -34,7 +34,7 @@ const Card = ({ vehicle }) => {
         </View>
         <StyledButton
           text="Select"
-          action={() => pilot.navigate("Form", vehicle)}
+          action={() => pilot.navigate("Post", vehicle)}
         />
       </View>
     </View>

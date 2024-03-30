@@ -44,7 +44,7 @@ export default function Listings() {
         />
         <StyledButton
           text="Manual"
-          //TODO: action = logged in ? form : login
+          //TODO: action = logged in ? post : login
           action={() => pilot.navigate("Post")}
           secondary
         />
