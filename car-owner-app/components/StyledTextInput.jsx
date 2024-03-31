@@ -34,8 +34,8 @@ const styles = StyleSheet.create({
   container: {
     position: "relative",
     flexGrow: 1,
-    height: 50,
-    marginBottom: 15,
+    height: 45,
+    marginBottom: 10,
   },
   label: {
     position: "absolute",
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     left: 10,
     zIndex: 9,
     color: "#284b63aa",
-    fontSize: 18,
+    fontSize: 16,
     pointerEvents: "none",
   },
   input: {
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     justifyContent: "flex-end",
     flex: 1,
-    fontSize: 18,
+    fontSize: 16,
     backgroundColor: "#fff",
     borderColor: "#284b63",
     borderBottomWidth: 2,

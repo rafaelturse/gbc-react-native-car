@@ -1,16 +1,16 @@
 import { Pressable, Text, StyleSheet } from "react-native";
 
-const StyledButton = ({ text, action, secondary, small }) => {
+const StyledButton = ({ text, action, secondary, auth }) => {
   return (
     <Pressable
       style={[
         styles.button,
         secondary && styles.alternateColor,
-        small && { height: "auto" },
+        auth && { height: "auto", marginRight: 20 },
       ]}
       onPress={action && action}
     >
-      <Text style={[styles.buttonText, small && { fontSize: 16 }]}>{text}</Text>
+      <Text style={[styles.buttonText, auth && { fontSize: 16 }]}>{text}</Text>
     </Pressable>
   );
 };
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
   button: {
     display: "flex",
     justifyContent: "center",
-    height: 50,
+    height: 45,
     backgroundColor: "#fff",
     borderRadius: 10,
     paddingVertical: 5,

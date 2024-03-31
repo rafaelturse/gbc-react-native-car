@@ -62,7 +62,8 @@ const styles = StyleSheet.create({
   view: {
     width: "100%",
     flex: 1,
-    padding: 20,
+    paddingTop: 10,
+    paddingHorizontal: 20,
   },
   header: {
     fontSize: 20,
