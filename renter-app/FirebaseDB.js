@@ -8,10 +8,10 @@ const firebaseConfig = {
   storageBucket: "gbc-react-native.appspot.com",
   messagingSenderId: "1744968402",
   appId: "1:1744968402:web:feaeeb5431eeea87d32b0b",
-};
+}
 
 const app = initializeApp(firebaseConfig)
 
 const db = getFirestore(app)
 
-export default db
+export { db }

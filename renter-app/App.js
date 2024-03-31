@@ -7,6 +7,7 @@ import Reservations from './view/Reservations'
 const Tab = createBottomTabNavigator()
 
 export default function App() {
+  
   return (
     <NavigationContainer>
         <Tab.Navigator>          
