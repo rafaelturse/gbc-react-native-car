@@ -1,4 +1,4 @@
-import { db } from "../FirebaseDB"
+import { db } from "../../FirebaseDB"
 import { collection, getDocs } from "firebase/firestore"
 
 export const getAllVehicles = async () => {
@@ -14,10 +14,6 @@ export const getAllVehicles = async () => {
             })
 
             return vehicles
-        } else {
-            console.log(">>> ERROR: No such document!")
-        }
-    } catch (error) {
-        console.error(">>> ERROR: Error fetching document: ", error)
-    }
+        } else { console.error(">>> ERROR: No such document!") }
+    } catch (e) { console.error(">>> ERROR: Error fetching document: ", e) }
 }

@@ -1,20 +1,24 @@
-import { StyleSheet, Text, View, Image, Dimensions } from "react-native"
+import { StyleSheet, Text, View, Image, Dimensions, Modal, TouchableOpacity } from "react-native"
 import { useState, useEffect } from "react"
 
 import MapView, { Marker } from "react-native-maps"
 import * as Location from 'expo-location'
 
-import { getAllVehicles } from "../repository/vehicleDBActions"
+import { getAllVehicles } from "../data/repository/vehicleDBActions"
 
 export default function Home() {
 
-    const [loading, setLoading] = useState(true)
     const [deviceLocation, setDeviceLocation] = useState(null)
+    const [loading, setLoading] = useState(true)
+
     const [vehicles, setVehicles] = useState([])
+    const [selectedVehicle, setSelectedVehicle] = useState(null)
+    const [modalVisible, setModalVisible] = useState(false)
 
     const getCurrentLocation = async () => {
         try {
             let { status } = await Location.requestForegroundPermissionsAsync()
+
             if (status !== 'granted') {
                 alert(`>>> INFO: Permission to access location was denied`)
                 return
@@ -30,14 +34,25 @@ export default function Home() {
 
             setLoading(false)
         } catch (err) {
-            console.log(e)
+            console.error(e)
             setLoading(false)
         }
     }
 
     const fetchVehicles = async () => {
-        const vehicles = await getAllVehicles()
-        setVehicles(vehicles)
+        try {
+            const vehicles = await getAllVehicles()
+            setVehicles(vehicles)
+        } catch (e) {
+            console.error(">>> ERROR: Error fetching vehicles:", e)
+        }
+    }
+
+    const handleMarkerPress = (vehicle) => {
+        console.log(`>>> INFO: Marker for - ${vehicle.name}`)
+
+        setSelectedVehicle(vehicle)
+        setModalVisible(true)
     }
 
     useEffect(() => {
@@ -56,42 +71,60 @@ export default function Home() {
                         longitudeDelta: 0.0421,
                     }}
                 >
-                    {
-                        vehicles.map (
-                            (item, pos) => {
-                                return (
-                                    <Marker
-                                        key={pos}
-                                        coordinate={{ latitude: item.lat, longitude: item.lon }}
-                                        title={item.name}
-                                        description={item.price}
-                                    >
-                                        <View style={styles.customMarker}>
-                                            <Image source={require("../assets/marker.png")} style={styles.markerImage} resizeMode="contain" />
-                                            <View style={styles.markerDescription}>
-                                                <Text style={styles.markerTitle}>{item.name}</Text>
-                                                <Text style={styles.markerPrice}>$ {item.price}</Text>
-                                            </View>
+                    {vehicles.map(
+                        (item, pos) => {
+                            return (
+                                <Marker
+                                    key={pos}
+                                    coordinate={{ latitude: item.lat, longitude: item.lon }}
+                                    onPress={() => handleMarkerPress(item)}
+                                >
+                                    <View style={styles.customMarker}>
+                                        <Image source={require("../assets/marker.png")} style={styles.markerImage} resizeMode="contain" />
+                                        <View style={styles.markerDescription}>
+                                            <Text style={styles.markerTitle}>{item.name}</Text>
+                                            <Text style={styles.markerPrice}>$ {item.price}</Text>
                                         </View>
-                                    </Marker>
-                                )
-                            }
-                        )
-                    }
+                                    </View>
+                                </Marker>
+                            )
+                        }
+                    )}
                 </MapView>
             )}
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalText}>{selectedVehicle && selectedVehicle.name}</Text>
+                        <Text style={styles.modalText}>Price: ${selectedVehicle && selectedVehicle.price}</Text>
+                        {/* Add more details here as needed */}
+                        <TouchableOpacity onPress={() => setModalVisible(false)}>
+                            <Text style={styles.closeButton}>Close</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </View>
     )
 }
 
-const { width, height } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window")
 
 const styles = StyleSheet.create({
 
+    /* CONTAINER */
     container: { flex: 1 },
 
+    /* MAP */
     map: { flex: 1 },
 
+    /* MARKER */
     customMarker: { alignItems: "center" },
     markerImage: {
         width: width * 0.1,
@@ -106,7 +139,7 @@ const styles = StyleSheet.create({
         padding: 5
     },
     markerTitle: {
-        fontSize: 10,
+        fontSize: 12,
         color: "#444",
         fontWeight: "bold",
         textAlign: "center",
@@ -116,5 +149,28 @@ const styles = StyleSheet.create({
         color: "#333",
         fontWeight: "bold",
         textAlign: "center",
+    },
+
+    /* MODAL */
+    modalContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContent: {
+        backgroundColor: "#fff",
+        padding: 20,
+        borderRadius: 10,
+        alignItems: "center",
+    },
+    modalText: {
+        fontSize: 18,
+        marginBottom: 10,
+    },
+    closeButton: {
+        fontSize: 16,
+        color: "blue",
+        marginTop: 10,
     },
 })
