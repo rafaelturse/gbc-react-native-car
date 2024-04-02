@@ -1,4 +1,4 @@
-import { View, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet, FlatList, Text } from "react-native";
 import useFetchVehicleData from "../utils/useFetchVehicleData";
 import Card from "../components/Card";
 import StyledButton from "../components/StyledButton";
@@ -8,30 +8,25 @@ import { useEffect, useState } from "react";
 
 export default function Listings() {
   const [searchInput, setSearchInput] = useState("");
-  const [vehicleList, setVehicleList] = useState();
-  const { vehicles, loading } = useFetchVehicleData();
+  const [vehicleList, setVehicleList] = useState([]);
+  const { vehicles, loading, error } = useFetchVehicleData();
   const pilot = useNavigation();
 
   useEffect(() => {
-    if (!loading && searchInput != "") {
-      const filteredVehicles = vehicles.filter(
-        (vehicle) =>
-          vehicle.make
-            .toLowerCase()
-            .includes(searchInput.toLocaleLowerCase()) ||
-          vehicle.model
-            .toLowerCase()
-            .includes(searchInput.toLocaleLowerCase()) ||
-          vehicle.trim.toLowerCase().includes(searchInput.toLocaleLowerCase())
+    if (searchInput != "") {
+      const filteredVehicles = vehicles.filter((v) =>
+        v.name.toLowerCase().includes(searchInput.toLowerCase())
       );
       setVehicleList(filteredVehicles);
     } else {
-      setVehicleList(vehicles);
+      if (!loading && error == null) {
+        setVehicleList(vehicles);
+      }
     }
   }, [searchInput]);
 
   useEffect(() => {
-    !loading && setVehicleList(vehicles);
+    setVehicleList(vehicles);
   }, [loading]);
 
   return (
@@ -49,11 +44,15 @@ export default function Listings() {
           secondary
         />
       </View>
-      <FlatList
-        data={vehicleList}
-        renderItem={({ item }) => <Card vehicle={item} />}
-        style={styles.list}
-      />
+      {loading ? (
+        <Text>Loading vehicle list...</Text>
+      ) : (
+        <FlatList
+          data={vehicleList}
+          renderItem={({ item }) => <Card vehicle={item} />}
+          style={styles.list}
+        />
+      )}
     </View>
   );
 }
