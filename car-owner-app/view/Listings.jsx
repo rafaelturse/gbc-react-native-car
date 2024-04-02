@@ -5,12 +5,15 @@ import StyledButton from "../components/StyledButton";
 import { useNavigation } from "@react-navigation/native";
 import StyledTextInput from "../components/StyledTextInput";
 import { useEffect, useState } from "react";
+import { useUserContext } from "../utils/UserContext";
+import { showAlert } from "../utils/showAlert";
 
 export default function Listings() {
   const [searchInput, setSearchInput] = useState("");
   const [vehicleList, setVehicleList] = useState([]);
   const { vehicles, loading, error } = useFetchVehicleData();
   const pilot = useNavigation();
+  const { user } = useUserContext();
 
   useEffect(() => {
     if (searchInput != "") {
@@ -39,8 +42,14 @@ export default function Listings() {
         />
         <StyledButton
           text="Manual"
-          //TODO: action = logged in ? post : login
-          action={() => pilot.navigate("Post")}
+          action={
+            user
+              ? () => pilot.navigate("Post")
+              : () =>
+                  showAlert("Access denied", "You must be logged in", () =>
+                    pilot.navigate("Login")
+                  )
+          }
           secondary
         />
       </View>

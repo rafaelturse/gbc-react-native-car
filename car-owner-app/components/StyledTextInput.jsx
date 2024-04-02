@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { StyleSheet, TextInput, View, Text } from "react-native";
 
-const StyledTextInput = ({ value, onChangeText, label }) => {
+const StyledTextInput = ({ value, onChangeText, label, secureTextEntry }) => {
   const [borderWidth, setBorderWidth] = useState(2);
   const [isFocused, setIsFocused] = useState(false);
 
@@ -25,6 +25,7 @@ const StyledTextInput = ({ value, onChangeText, label }) => {
         onChangeText={onChangeText}
         onFocus={handleFocus}
         onBlur={handleBlur}
+        secureTextEntry={secureTextEntry}
       />
     </View>
   );

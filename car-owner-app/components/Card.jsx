@@ -3,9 +3,12 @@ import { View, Text, StyleSheet } from "react-native";
 import Carousel from "./Carousel";
 import StyledButton from "./StyledButton";
 import { useNavigation } from "@react-navigation/native";
+import { useUserContext } from "../utils/UserContext";
+import { showAlert } from "../utils/showAlert";
 
 const Card = ({ vehicle, mgmnt }) => {
   const pilot = useNavigation();
+  const { user } = useUserContext();
 
   return (
     <View style={styles.card}>
@@ -52,8 +55,15 @@ const Card = ({ vehicle, mgmnt }) => {
           )
         ) : (
           <StyledButton
-            text="Select"
-            action={() => pilot.navigate("Post", vehicle)}
+            text="Manual"
+            action={
+              user
+                ? () => pilot.navigate("Post", vehicle)
+                : () =>
+                    showAlert("Access denied", "You must be logged in", () =>
+                      pilot.navigate("Login")
+                    )
+            }
           />
         )}
         {/* {mgmnt ? (

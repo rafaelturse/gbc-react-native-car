@@ -6,12 +6,24 @@ import StyledButton from "../components/StyledButton";
 import { useNavigation } from "@react-navigation/native";
 import { useUserContext } from "../utils/UserContext";
 import { logout } from "../utils/AuthActions";
+import { showAlert } from "../utils/showAlert";
 
 const Tab = createBottomTabNavigator();
 
 export default function Main() {
   const pilot = useNavigation();
   const { user, setUser } = useUserContext();
+
+  const handleManagementTabPress = (e) => {
+    if (user) {
+      pilot.navigate("Management");
+    } else {
+      e.preventDefault();
+      showAlert("Access denied", "You must be logged in", () =>
+        pilot.navigate("Login")
+      );
+    }
+  };
 
   return (
     <Tab.Navigator>
@@ -48,6 +60,9 @@ export default function Main() {
               size={size}
             />
           ),
+        }}
+        listeners={{
+          tabPress: handleManagementTabPress,
         }}
       />
     </Tab.Navigator>

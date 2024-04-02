@@ -2,7 +2,14 @@ import { FirebaseAuth } from "../Firebase";
 import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { getUser } from "./DBActions";
 
-export const login = async (email, password, setUser, setLoading, pilot) => {
+export const login = async (
+  email,
+  password,
+  setUser,
+  setLoading,
+  pilot,
+  setError
+) => {
   setLoading(true);
   try {
     const response = await signInWithEmailAndPassword(
@@ -14,7 +21,7 @@ export const login = async (email, password, setUser, setLoading, pilot) => {
     setUser(user);
     pilot.navigate("Home");
   } catch (error) {
-    console.log(error);
+    setError("Authentication error: Invalid credentials");
   } finally {
     setLoading(false);
   }
