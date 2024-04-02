@@ -1,19 +1,16 @@
-import { StyleSheet, Text, View, Image, Dimensions, Modal, TouchableOpacity } from "react-native"
 import { useState, useEffect } from "react"
-
+import { StyleSheet, View, Image, Text, Dimensions, TouchableOpacity, Animated, Pressable } from "react-native"
 import MapView, { Marker } from "react-native-maps"
 import * as Location from 'expo-location'
-
 import { getAllVehicles } from "../data/repository/vehicleDBActions"
 
 export default function Home() {
 
     const [deviceLocation, setDeviceLocation] = useState(null)
     const [loading, setLoading] = useState(true)
-
     const [vehicles, setVehicles] = useState([])
     const [selectedVehicle, setSelectedVehicle] = useState(null)
-    const [modalVisible, setModalVisible] = useState(false)
+    const [cardAnimation] = useState(new Animated.Value(0))
 
     const getCurrentLocation = async () => {
         try {
@@ -52,7 +49,20 @@ export default function Home() {
         console.log(`>>> INFO: Marker for - ${vehicle.name}`)
 
         setSelectedVehicle(vehicle)
-        setModalVisible(true)
+
+        Animated.timing(cardAnimation, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: true
+        }).start()
+    }
+
+    const closeCard = () => {
+        Animated.timing(cardAnimation, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true
+        }).start(() => setSelectedVehicle(null))
     }
 
     useEffect(() => {
@@ -93,23 +103,18 @@ export default function Home() {
                 </MapView>
             )}
 
-            <Modal
-                animationType="slide"
-                transparent={true}
-                visible={modalVisible}
-                onRequestClose={() => setModalVisible(false)}
-            >
-                <View style={styles.modalContainer}>
-                    <View style={styles.modalContent}>
-                        <Text style={styles.modalText}>{selectedVehicle && selectedVehicle.name}</Text>
-                        <Text style={styles.modalText}>Price: ${selectedVehicle && selectedVehicle.price}</Text>
-                        {/* Add more details here as needed */}
-                        <TouchableOpacity onPress={() => setModalVisible(false)}>
+            {selectedVehicle &&
+                <Animated.View style={[styles.cardContainer, { transform: [{ translateY: cardAnimation.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }]}>
+                    <View style={styles.card}>
+                        <Text style={styles.cardTitle}>{selectedVehicle.name}</Text>
+                        <Text style={styles.cardPrice}>$ {selectedVehicle.price}</Text>
+
+                        <TouchableOpacity onPress={closeCard}>
                             <Text style={styles.closeButton}>Close</Text>
                         </TouchableOpacity>
                     </View>
-                </View>
-            </Modal>
+                </Animated.View>
+            }
         </View>
     )
 }
@@ -120,9 +125,8 @@ const styles = StyleSheet.create({
 
     /* CONTAINER */
     container: { flex: 1 },
-
-    /* MAP */
     map: { flex: 1 },
+    mapContainer: { flex: 1 },
 
     /* MARKER */
     customMarker: { alignItems: "center" },
@@ -151,26 +155,36 @@ const styles = StyleSheet.create({
         textAlign: "center",
     },
 
-    /* MODAL */
-    modalContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
+    /* CARD */
+    cardContainer: {
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: "rgba(255, 255, 255, 0.6)",
+        padding: 18,
+        paddingBottom: 30,
     },
-    modalContent: {
+    card: {
         backgroundColor: "#fff",
-        padding: 20,
-        borderRadius: 10,
-        alignItems: "center",
+        padding: 16,
+        borderWidth: 1,
+        borderColor: "#ccc",
+        borderRadius: 16,
+        elevation: 4,
     },
-    modalText: {
+    cardTitle: {
         fontSize: 18,
-        marginBottom: 10,
+        fontWeight: "bold",
+        marginBottom: 8,
+    },
+    cardPrice: {
+        fontSize: 16,
+        marginBottom: 8,
     },
     closeButton: {
-        fontSize: 16,
-        color: "blue",
-        marginTop: 10,
+        marginTop: 20,
+        fontSize: 14,
+        textAlign: "center",
     },
 })
