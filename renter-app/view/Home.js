@@ -1,8 +1,14 @@
 import { useState, useEffect } from "react"
 import { StyleSheet, View, Image, Text, Dimensions, TouchableOpacity, Animated, Pressable } from "react-native"
+
 import MapView, { Marker } from "react-native-maps"
 import * as Location from 'expo-location'
+
+import StyledButton from "../components/StyledButton"
+import { generateRandomFutureDate } from "../utils/dateUtils"
+
 import { getAllVehicles } from "../data/repository/vehicleDBActions"
+import { saveReservation } from "../data/repository/reservationDBActions"
 
 export default function Home() {
 
@@ -65,6 +71,10 @@ export default function Home() {
         }).start(() => setSelectedVehicle(null))
     }
 
+    const reservation = () => {
+        saveReservation(selectedVehicle)
+    }
+
     useEffect(() => {
         getCurrentLocation()
         fetchVehicles()
@@ -106,12 +116,26 @@ export default function Home() {
             {selectedVehicle &&
                 <Animated.View style={[styles.cardContainer, { transform: [{ translateY: cardAnimation.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }]}>
                     <View style={styles.card}>
-                        <Text style={styles.cardTitle}>{selectedVehicle.name}</Text>
-                        <Text style={styles.cardPrice}>$ {selectedVehicle.price}</Text>
-
                         <TouchableOpacity onPress={closeCard}>
-                            <Text style={styles.closeButton}>Close</Text>
+                            <Image source={require("../assets/close.png")} style={styles.cardClose} />
                         </TouchableOpacity>
+                        <View style={styles.contentCenterH}>
+                            <Image source={require("../assets/marker.png")} style={styles.cardImage} />
+                            <Text style={styles.info}>Renter: John Doe</Text>
+                        </View>
+                        <View style={styles.cardVehicle}>
+                            <View style={styles.cardCarInfo}>
+                                <Text style={styles.price}>${selectedVehicle.price}</Text>
+                                <Text style={styles.title}>{selectedVehicle.name}</Text>
+                                <Text style={styles.info}>License Plate: 50541</Text>
+                            </View>
+                            <Image source={require("../assets/marker.png")} style={styles.cardImage} />
+                        </View>
+                        <View style={styles.contentCenterV}>
+                            <Text style={styles.cardDescription}>Booking Date</Text>
+                            <Text style={styles.cardDate}>{generateRandomFutureDate()}</Text>
+                        </View>
+                        <StyledButton text="BOOK NOW!" onPress={reservation} />
                     </View>
                 </Animated.View>
             }
@@ -123,10 +147,23 @@ const { width, height } = Dimensions.get("window")
 
 const styles = StyleSheet.create({
 
-    /* CONTAINER */
+    /* CONTENT */
     container: { flex: 1 },
     map: { flex: 1 },
     mapContainer: { flex: 1 },
+    
+    contentCenterH: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: 20,
+    },
+    contentCenterV: {
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        marginBottom: 20,
+    },
 
     /* MARKER */
     customMarker: { alignItems: "center" },
@@ -161,30 +198,54 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: "rgba(255, 255, 255, 0.6)",
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
         padding: 18,
         paddingBottom: 30,
     },
     card: {
         backgroundColor: "#fff",
-        padding: 16,
+        padding: 12,
         borderWidth: 1,
         borderColor: "#ccc",
         borderRadius: 16,
         elevation: 4,
     },
-    cardTitle: {
+    cardCarInfo: { marginBottom: 10, },
+    cardVehicle: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        marginBottom: 10,
+    },
+    cardImage: {
+        width: 50,
+        height: 50,
+        marginRight: 10,
+    },
+    cardClose: {
+        width: 14,
+        height: 14,
+        resizeMode: "contain",
+        alignSelf: 'flex-end',
+    },
+    cardDate: {
+        fontSize: 22,
+        fontWeight: "bold",
+    },
+    
+    /* TEXT */
+    description: { fontSize: 12 },
+    title: {
         fontSize: 18,
         fontWeight: "bold",
-        marginBottom: 8,
     },
-    cardPrice: {
+    info: {
         fontSize: 16,
-        marginBottom: 8,
+        marginBottom: 5,
     },
-    closeButton: {
-        marginTop: 20,
-        fontSize: 14,
-        textAlign: "center",
+    price: {
+        fontSize: 28,
+        marginBottom: 5,
+        fontWeight: "bold",
     },
 })
