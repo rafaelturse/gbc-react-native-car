@@ -1,25 +1,23 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, Pressable } from "react-native";
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet } from "react-native";
 import Carousel from "./Carousel";
 import StyledButton from "./StyledButton";
 import { useNavigation } from "@react-navigation/native";
 
-const Card = ({ vehicle }) => {
+const Card = ({ vehicle, mgmnt }) => {
   const pilot = useNavigation();
 
   return (
     <View style={styles.card}>
       <Carousel images={vehicle.images} />
       <View style={styles.details}>
-        <Text
-          style={styles.name}
-        >{`${vehicle.make} ${vehicle.model} ${vehicle.trim}`}</Text>
+        <Text style={styles.name}>{vehicle.name}</Text>
         <View style={styles.line} />
         <View style={styles.row}>
           <View style={styles.column}>
-            <Text style={styles.info}>{`Seats: ${vehicle.seats_max}`}</Text>
-            <Text style={styles.info}>{`Range: ${vehicle.total_range}km`}</Text>
-            <Text style={styles.info}>{`Year: ${vehicle.model_year}`}</Text>
+            <Text style={styles.info}>{`Seats: ${vehicle.seats}`}</Text>
+            <Text style={styles.info}>{`Range: ${vehicle.range}km`}</Text>
+            <Text style={styles.info}>{`Year: ${vehicle.year}`}</Text>
           </View>
 
           <View style={styles.column}>
@@ -32,10 +30,51 @@ const Card = ({ vehicle }) => {
             >{`Acceleration: ${vehicle.acceleration}`}</Text>
           </View>
         </View>
-        <StyledButton
-          text="Select"
-          action={() => pilot.navigate("Post", vehicle)}
-        />
+        {mgmnt ? (
+          vehicle.bookedBy == "" ? (
+            <Text style={styles.notBooked}>Not booked</Text>
+          ) : (
+            <View>
+              <Text style={styles.booked}>Booked by: {vehicle.bookedBy}</Text>
+              <View style={styles.buttonGroup}>
+                <StyledButton
+                  text="Accept"
+                  action={() => pilot.navigate("Post", vehicle)}
+                  accept
+                />
+                <StyledButton
+                  text="Reject"
+                  action={() => pilot.navigate("Post", vehicle)}
+                  reject
+                />
+              </View>
+            </View>
+          )
+        ) : (
+          <StyledButton
+            text="Select"
+            action={() => pilot.navigate("Post", vehicle)}
+          />
+        )}
+        {/* {mgmnt ? (
+          <View style={styles.buttonGroup}>
+            <StyledButton
+              text="Accept"
+              action={() => pilot.navigate("Post", vehicle)}
+              accept
+            />
+            <StyledButton
+              text="Reject"
+              action={() => pilot.navigate("Post", vehicle)}
+              reject
+            />
+          </View>
+        ) : (
+          <StyledButton
+            text="Select"
+            action={() => pilot.navigate("Post", vehicle)}
+          />
+        )} */}
       </View>
     </View>
   );
@@ -97,6 +136,23 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
     flex: 1,
+  },
+  buttonGroup: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 10,
+  },
+  notBooked: {
+    fontSize: 22,
+    width: "100%",
+    textAlign: "center",
+    color: "#fca311",
+    marginVertical: 10,
+  },
+  booked: {
+    textAlign: "center",
+    fontSize: 16,
+    marginBottom: 5,
   },
 });
 

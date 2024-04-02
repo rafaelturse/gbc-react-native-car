@@ -25,7 +25,7 @@ export default function Main() {
               action={
                 user ? () => logout(setUser) : () => pilot.navigate("Login")
               }
-              auth
+              small
             />
           ),
           tabBarIcon: ({ size, color }) => (

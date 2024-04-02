@@ -1,9 +1,11 @@
 import { View, StyleSheet, Image, ScrollView } from "react-native";
 import StyledButton from "../components/StyledButton";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import StyledTextInput from "../components/StyledTextInput";
 import Carousel from "../components/Carousel";
+import { useUserContext } from "../utils/UserContext";
+import { saveNewVehicleAndUpdateUser } from "../utils/DBActions";
 
 export default function Post() {
   const [name, setName] = useState();
@@ -16,19 +18,42 @@ export default function Post() {
   const [images, setImages] = useState();
   const route = useRoute();
   const vehicle = route.params;
+  const { user } = useUserContext();
+  const pilot = useNavigation();
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     //If there is a vehicle prop, pre populate the fields
     vehicle &&
       (setImages(vehicle.images),
-      setName(`${vehicle.make} ${vehicle.model} ${vehicle.trim}`),
-      setSeats(vehicle.seats_max.toString()),
-      setRange(vehicle.total_range.toString()),
-      setYear(vehicle.model_year.toString()),
+      setName(vehicle.name),
+      setSeats(vehicle.seats.toString()),
+      setRange(vehicle.range.toString()),
+      setYear(vehicle.year.toString()),
       setDoors(vehicle.doors.toString()),
       setHorsepower(vehicle.horsepower.toString()),
       setAcceleration(vehicle.acceleration.toString()));
   }, []);
+
+  const handleSubmit = () => {
+    setLoading(true);
+    const newVehicle = {
+      name: name,
+      seats: seats,
+      range: range,
+      year: year,
+      doors: doors,
+      horsepower: horsepower,
+      acceleration: acceleration,
+      images: images,
+      owner: user.email,
+      bookedBy: "",
+    };
+    saveNewVehicleAndUpdateUser(newVehicle, user.email).then(() => {
+      setLoading(false);
+      pilot.navigate("Management");
+    });
+  };
 
   return (
     <ScrollView style={styles.view}>
@@ -75,7 +100,10 @@ export default function Post() {
         onChangeText={setAcceleration}
         label="Acceleration"
       />
-      <StyledButton text="Submit" action={() => console.log("submit")} />
+      <StyledButton
+        text={loading ? "Creating..." : "Submit"}
+        action={handleSubmit}
+      />
       <View style={styles.spacer} />
     </ScrollView>
   );
