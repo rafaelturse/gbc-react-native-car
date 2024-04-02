@@ -1,7 +1,9 @@
 import { db } from "../../FirebaseDB"
-import { addDoc } from "firebase/firestore"
+import { collection, addDoc } from "firebase/firestore"
 
 export const saveReservation = async (reservation) => {
+    console.log(`>>> INFO: Saving reservation ${reservation}`)
+
     try {
         await addDoc(collection(db, "reservations"), reservation)
 

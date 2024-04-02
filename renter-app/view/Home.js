@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react"
-import { StyleSheet, View, Image, Text, Dimensions, TouchableOpacity, Animated, Pressable } from "react-native"
+import { StyleSheet, View, Image, Text, Dimensions, Alert, TouchableOpacity, Animated, Pressable } from "react-native"
 
 import MapView, { Marker } from "react-native-maps"
 import * as Location from 'expo-location'
 
 import StyledButton from "../components/StyledButton"
 import { generateRandomFutureDate } from "../utils/dateUtils"
+
+import { createVehicle } from "../data/model/Vehicle"
+import { createReservation } from "../data/model/Reservation"
 
 import { getAllVehicles } from "../data/repository/vehicleDBActions"
 import { saveReservation } from "../data/repository/reservationDBActions"
@@ -14,6 +17,7 @@ export default function Home() {
 
     const [deviceLocation, setDeviceLocation] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [randomFutureDate, setRandomFutureDate] = useState()
     const [vehicles, setVehicles] = useState([])
     const [selectedVehicle, setSelectedVehicle] = useState(null)
     const [cardAnimation] = useState(new Animated.Value(0))
@@ -44,15 +48,41 @@ export default function Home() {
 
     const fetchVehicles = async () => {
         try {
-            const vehicles = await getAllVehicles()
+            const vehicles = []
+            const dbVehicles = await getAllVehicles()
+
+            //load all vehicles from fb
+            dbVehicles.forEach((i, index) => {
+                console.log(`>>> INFO: Vehicle ${++index}: ${i.name}`)
+                vehicles.push(createVehicle(i))
+            })
+
+            //TODO: REMOVE
+            //mock a custom single one (lat lon different)
+            vehicles.push(createVehicle(
+                "",
+                dbVehicles[1].acceleration,
+                dbVehicles[1].doors,
+                dbVehicles[1].horsepower,
+                dbVehicles[1].images,
+                dbVehicles[1].name,
+                dbVehicles[1].owner,
+                dbVehicles[1].range,
+                dbVehicles[1].seats,
+                dbVehicles[1].year,
+                dbVehicles[1].bookedBy,
+                43.642717032381455,
+                -79.38680723109938
+            ))
+
             setVehicles(vehicles)
-        } catch (e) {
-            console.error(">>> ERROR: Error fetching vehicles:", e)
-        }
+        } catch (e) { console.error(">>> ERROR: Error fetching vehicles:", e) }
     }
 
     const handleMarkerPress = (vehicle) => {
         console.log(`>>> INFO: Marker for - ${vehicle.name}`)
+
+        setRandomFutureDate(generateRandomFutureDate())
 
         setSelectedVehicle(vehicle)
 
@@ -71,8 +101,23 @@ export default function Home() {
         }).start(() => setSelectedVehicle(null))
     }
 
-    const reservation = () => {
-        saveReservation(selectedVehicle)
+    const reservation = (vehicle) => {
+        console.log(`>>> INFO: Reservation process for - ${vehicle.name}`)
+
+        //add user, status
+        saveReservation(
+            createReservation(
+                randomFutureDate,
+                vehicle
+            )
+        )
+
+        Alert.alert(
+            'Success!',
+            'Reservation Booked',
+            [{ text: 'OK', onPress: () => console.log('>>> INFO: Reservation booked confirmation!') }],
+            { cancelable: false }
+        )
     }
 
     useEffect(() => {
@@ -92,18 +137,17 @@ export default function Home() {
                     }}
                 >
                     {vehicles.map(
-                        (item, pos) => {
+                        (vehicle, pos) => {
                             return (
                                 <Marker
                                     key={pos}
-                                    coordinate={{ latitude: item.lat, longitude: item.lon }}
-                                    onPress={() => handleMarkerPress(item)}
+                                    coordinate={{ latitude: vehicle.latitude, longitude: vehicle.longitude }}
+                                    onPress={() => handleMarkerPress(vehicle)}
                                 >
                                     <View style={styles.customMarker}>
                                         <Image source={require("../assets/marker.png")} style={styles.markerImage} resizeMode="contain" />
                                         <View style={styles.markerDescription}>
-                                            <Text style={styles.markerTitle}>{item.name}</Text>
-                                            <Text style={styles.markerPrice}>$ {item.price}</Text>
+                                            <Text style={styles.markerTitle}>{vehicle.name}</Text>
                                         </View>
                                     </View>
                                 </Marker>
@@ -119,23 +163,30 @@ export default function Home() {
                         <TouchableOpacity onPress={closeCard}>
                             <Image source={require("../assets/close.png")} style={styles.cardClose} />
                         </TouchableOpacity>
-                        <View style={styles.contentCenterH}>
-                            <Image source={require("../assets/marker.png")} style={styles.cardImage} />
+                        <View style={styles.contentEndH}>
+                            {/* TODO: change for user photo*/}
                             <Text style={styles.info}>Renter: John Doe</Text>
-                        </View>
-                        <View style={styles.cardVehicle}>
-                            <View style={styles.cardCarInfo}>
-                                <Text style={styles.price}>${selectedVehicle.price}</Text>
-                                <Text style={styles.title}>{selectedVehicle.name}</Text>
-                                <Text style={styles.info}>License Plate: 50541</Text>
-                            </View>
                             <Image source={require("../assets/marker.png")} style={styles.cardImage} />
+                        </View>
+                        <Text style={styles.description}>{selectedVehicle.year}</Text>
+                        <Text style={styles.title}>{selectedVehicle.name}</Text>
+                        <View style={[styles.contentCenterH, styles.cardVehicle]}>
+                            <Text style={styles.info}>- Doors: {selectedVehicle.doors}</Text>
+                            <Text style={styles.info}>- Seats: {selectedVehicle.seats}</Text>
+                            <Text style={styles.info}>- Range: {selectedVehicle.range}</Text>
+                        </View>
+                        <View style={[styles.contentCenterH, styles.cardVehicle]}>
+                            <Text style={styles.info}>- Acceleration: {selectedVehicle.acceleration}</Text>
+                            <Text style={styles.info}>- Horse Power: {selectedVehicle.horsepower}</Text>
+                        </View>
+                        <View style={styles.contentCenterH}>
+                            <Image source={{ uri: selectedVehicle.images[0].url_thumbnail }} style={styles.cardVehicleImage} />
                         </View>
                         <View style={styles.contentCenterV}>
                             <Text style={styles.cardDescription}>Booking Date</Text>
-                            <Text style={styles.cardDate}>{generateRandomFutureDate()}</Text>
+                            <Text style={styles.cardDate}>{randomFutureDate}</Text>
                         </View>
-                        <StyledButton text="BOOK NOW!" onPress={reservation} />
+                        <StyledButton text="BOOK NOW!" action={() => reservation(selectedVehicle)} />
                     </View>
                 </Animated.View>
             }
@@ -151,18 +202,25 @@ const styles = StyleSheet.create({
     container: { flex: 1 },
     map: { flex: 1 },
     mapContainer: { flex: 1 },
-    
+
     contentCenterH: {
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        marginBottom: 20,
+        marginBottom: 5,
     },
     contentCenterV: {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         marginBottom: 20,
+    },
+
+    contentEndH: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        marginBottom: 5,
     },
 
     /* MARKER */
@@ -204,40 +262,52 @@ const styles = StyleSheet.create({
     },
     card: {
         backgroundColor: "#fff",
-        padding: 12,
-        borderWidth: 1,
-        borderColor: "#ccc",
         borderRadius: 16,
+        padding: 12,
+        shadowColor: "#284b63",
+        shadowOffset: {
+            width: 3,
+            height: 3,
+        },
+        shadowOpacity: 1,
+        shadowRadius: 0,
+        borderWidth: 1,
+        borderColor: "#14213d",
         elevation: 4,
     },
-    cardCarInfo: { marginBottom: 10, },
     cardVehicle: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between",
-        marginBottom: 10,
+        gap: 30,
+        marginTop: 4,
     },
     cardImage: {
         width: 50,
         height: 50,
-        marginRight: 10,
+        margin: 10,
+    },
+    cardVehicleImage: {
+        width: width * .45,
+        height: height * 0.15,
     },
     cardClose: {
         width: 14,
         height: 14,
         resizeMode: "contain",
         alignSelf: 'flex-end',
+        marginBottom: 10
     },
     cardDate: {
-        fontSize: 22,
+        fontSize: 20,
         fontWeight: "bold",
     },
-    
+
     /* TEXT */
     description: { fontSize: 12 },
     title: {
-        fontSize: 18,
+        fontSize: 26,
         fontWeight: "bold",
+        marginBottom: 20
     },
     info: {
         fontSize: 16,
