@@ -20,6 +20,8 @@ export default Reservations = () => {
 
     useEffect(() => { fetchReservations() }, [loading])
 
+    useEffect(() => { fetchReservations() }, [loading])
+
     return (
         <View style={styles.container}>
             {!loading && reservations && (
