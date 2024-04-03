@@ -1,5 +1,5 @@
 import { db } from "../../FirebaseDB"
-import { collection, getDocs } from "firebase/firestore"
+import { collection, doc, getDocs, setDoc } from "firebase/firestore"
 
 export const getAllVehicles = async () => {
     let vehicles = []
@@ -16,4 +16,14 @@ export const getAllVehicles = async () => {
             return vehicles
         } else { console.error(">>> ERROR: No such document!") }
     } catch (e) { console.error(">>> ERROR: Error fetching document: ", e) }
+}
+
+export const updateVehicle = async (vehicle) => {
+    try {
+        await setDoc(doc(db, "vehicles", vehicle.id), vehicle )
+        console.log(">>> INFO: Vehicle updated!")
+    } catch (e) {
+        console.error(">>> ERROR: Error updating vehicle:", e)
+        throw e
+    }
 }

@@ -1,19 +1,17 @@
+/* REACT */
 import { useState, useEffect } from "react"
-import { StyleSheet, View, Image, Text, Dimensions, Alert, TouchableOpacity, Animated, Pressable } from "react-native"
-
+import { StyleSheet, View, Image, Text, Dimensions, TouchableOpacity, Animated } from "react-native"
+/* MAP */
 import MapView, { Marker } from "react-native-maps"
 import * as Location from 'expo-location'
-
-import StyledButton from "../components/StyledButton"
+/* CUSTOM */
 import { generateRandomFutureDate } from "../utils/dateUtils"
+import { primaryAlert } from "../utils/alertUtils"
+import StyledButton from "../components/StyledButton"
+/* DB */
+import { getAllVehicles, updateVehicle } from "../data/repository/vehicleDBActions"
 
-import { createVehicle } from "../data/model/Vehicle"
-import { createReservation } from "../data/model/Reservation"
-
-import { getAllVehicles } from "../data/repository/vehicleDBActions"
-import { saveReservation } from "../data/repository/reservationDBActions"
-
-export default function Home() {
+export default Home = () => {
 
     const [deviceLocation, setDeviceLocation] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -35,8 +33,8 @@ export default function Home() {
             console.log(`>>> INFO: The location is: ${JSON.stringify(location)}`)
 
             setDeviceLocation({
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude
+                lat: location.coords.latitude,
+                lon: location.coords.longitude
             })
 
             setLoading(false)
@@ -48,33 +46,7 @@ export default function Home() {
 
     const fetchVehicles = async () => {
         try {
-            const vehicles = []
-            const dbVehicles = await getAllVehicles()
-
-            //load all vehicles from fb
-            dbVehicles.forEach((i, index) => {
-                console.log(`>>> INFO: Vehicle ${++index}: ${i.name}`)
-                vehicles.push(createVehicle(i))
-            })
-
-            //TODO: REMOVE
-            //mock a custom single one (lat lon different)
-            vehicles.push(createVehicle(
-                "",
-                dbVehicles[1].acceleration,
-                dbVehicles[1].doors,
-                dbVehicles[1].horsepower,
-                dbVehicles[1].images,
-                dbVehicles[1].name,
-                dbVehicles[1].owner,
-                dbVehicles[1].range,
-                dbVehicles[1].seats,
-                dbVehicles[1].year,
-                dbVehicles[1].bookedBy,
-                43.642717032381455,
-                -79.38680723109938
-            ))
-
+            const vehicles = await getAllVehicles()
             setVehicles(vehicles)
         } catch (e) { console.error(">>> ERROR: Error fetching vehicles:", e) }
     }
@@ -104,19 +76,15 @@ export default function Home() {
     const reservation = (vehicle) => {
         console.log(`>>> INFO: Reservation process for - ${vehicle.name}`)
 
-        //add user, status
-        saveReservation(
-            createReservation(
-                randomFutureDate,
-                vehicle
-            )
-        )
+        vehicle.bookingStatus = 'pending'
+        vehicle.bookedBy = 'John Johns' //TODO: get logged user
+        vehicle.futureDate = randomFutureDate
+        updateVehicle(vehicle)
 
-        Alert.alert(
+        primaryAlert(
             'Success!',
-            'Reservation Booked',
-            [{ text: 'OK', onPress: () => console.log('>>> INFO: Reservation booked confirmation!') }],
-            { cancelable: false }
+            'Reservation Booked. Wait for the approval before the booking can be confirmed!',
+            '>>> INFO: Reservation booked confirmation!'
         )
     }
 
@@ -130,42 +98,47 @@ export default function Home() {
             {!loading && deviceLocation && (
                 <MapView style={styles.map}
                     initialRegion={{
-                        latitude: deviceLocation?.latitude ?? 0,
-                        longitude: deviceLocation?.longitude ?? 0,
+                        latitude: deviceLocation?.lat ?? 0,
+                        longitude: deviceLocation?.lon ?? 0,
                         latitudeDelta: 0.0922,
                         longitudeDelta: 0.0421,
                     }}
                 >
-                    {vehicles.map(
-                        (vehicle, pos) => {
-                            return (
-                                <Marker
-                                    key={pos}
-                                    coordinate={{ latitude: vehicle.latitude, longitude: vehicle.longitude }}
-                                    onPress={() => handleMarkerPress(vehicle)}
-                                >
-                                    <View style={styles.customMarker}>
-                                        <Image source={require("../assets/marker.png")} style={styles.markerImage} resizeMode="contain" />
-                                        <View style={styles.markerDescription}>
-                                            <Text style={styles.markerTitle}>{vehicle.name}</Text>
+                    {vehicles.length > 0 ? (
+                        vehicles.map(
+                            (vehicle, pos) => {
+                                return (
+                                    <Marker
+                                        key={pos}
+                                        //coordinate={{ latitude: vehicle.lat, longitude: vehicle.lon }}
+                                        coordinate={{ latitude: "43.64299380867883", longitude: "-79.38701975667243" }}
+                                        onPress={() => handleMarkerPress(vehicle)}
+                                    >
+                                        <View style={styles.customMarker}>
+                                            <Image source={require("../assets/marker.png")} style={styles.markerImage} resizeMode="contain" />
+                                            <View style={styles.markerDescription}>
+                                                <Text style={styles.markerTitle}>{vehicle.name}</Text>
+                                                <Text style={styles.markerPrice}>${vehicle.price}</Text>
+                                            </View>
                                         </View>
-                                    </View>
-                                </Marker>
-                            )
-                        }
-                    )}
+                                    </Marker>
+                                )
+                            }
+                        )) : (<Text></Text>)
+                    }
                 </MapView>
             )}
 
             {selectedVehicle &&
                 <Animated.View style={[styles.cardContainer, { transform: [{ translateY: cardAnimation.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }]}>
+
                     <View style={styles.card}>
                         <TouchableOpacity onPress={closeCard}>
                             <Image source={require("../assets/close.png")} style={styles.cardClose} />
                         </TouchableOpacity>
                         <View style={styles.contentEndH}>
                             {/* TODO: change for user photo*/}
-                            <Text style={styles.info}>Renter: John Doe</Text>
+                            <Text style={styles.info}>Renter: {selectedVehicle.ownerName}</Text>
                             <Image source={require("../assets/marker.png")} style={styles.cardImage} />
                         </View>
                         <Text style={styles.description}>{selectedVehicle.year}</Text>
