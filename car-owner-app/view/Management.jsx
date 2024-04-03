@@ -3,34 +3,28 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import { useUserContext } from "../utils/UserContext";
 import { getOwnedVehicles } from "../utils/DBActions";
 import Card from "../components/Card";
+import { useOwnedVehicleContext } from "../utils/OwnedVehicleContext";
 
 export default function Management() {
-  const [vehicles, setVehicles] = useState([]);
   const { user } = useUserContext();
+  const { ownedVehicles, setOwnedVehicles } = useOwnedVehicleContext();
 
   useEffect(() => {
-    const fetchVehicles = async () => {
-      if (user?.email) {
-        const retrievedVehicles = await getOwnedVehicles(user.email);
-        setVehicles(retrievedVehicles);
-      } else {
-        setVehicles([]);
-      }
-    };
+    getOwnedVehicles(user.email, setOwnedVehicles);
+  }, []);
 
-    fetchVehicles();
-  }, [user]);
+  useEffect(() => {}, [ownedVehicles]);
 
   return (
     <View style={styles.view}>
-      {vehicles != null ? (
+      {ownedVehicles.length === 0 ? (
+        <Text>No vehicles posted</Text>
+      ) : (
         <FlatList
-          data={vehicles}
+          data={ownedVehicles}
           renderItem={({ item }) => <Card vehicle={item} mgmnt />}
           style={styles.list}
         />
-      ) : (
-        <Text>Loading...</Text>
       )}
     </View>
   );

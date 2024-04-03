@@ -11,28 +11,31 @@ import {
   where,
 } from "firebase/firestore";
 import { FirebaseDB } from "../Firebase";
+import { showAlert } from "./showAlert";
 
-export const getVehicles = async () => {
-  let vehicles = [];
-  try {
-    const response = await getDocs(collection(FirebaseDB, "vehicles"));
-    if (!response.empty) {
-      response.forEach((doc) => {
-        vehicles.push(doc.data());
-        console.log(`${doc.id} => ${doc.data().name}`);
-      });
-      return vehicles;
-    } else {
-      console.log("No such document!");
-    }
-  } catch (error) {
-    console.error("Error fetching document: ", error);
-  }
-};
+// export const getVehicles = async () => {
+//   let vehicles = [];
+//   try {
+//     const response = await getDocs(collection(FirebaseDB, "vehicles"));
+//     if (!response.empty) {
+//       response.forEach((doc) => {
+//         vehicles.push(doc.data());
+//         console.log(`${doc.id} => ${doc.data().name}`);
+//       });
+//       return vehicles;
+//     } else {
+//       console.log("No such document!");
+//     }
+//   } catch (error) {
+//     console.error("Error fetching document: ", error);
+//   }
+// };
 
 export const getUser = async (email) => {
   try {
-    const response = await getDoc(doc(FirebaseDB, "users", email));
+    const response = await getDoc(
+      doc(FirebaseDB, "users", email.toLowerCase())
+    );
     if (response.exists()) {
       const user = response.data();
       return user;
@@ -62,39 +65,80 @@ export const getUser = async (email) => {
 //   }
 // };
 
-export const saveNewVehicleAndUpdateUser = async (vehicleData, userEmail) => {
-  try {
-    const vehicleRef = await addDoc(
-      collection(FirebaseDB, "vehicles"),
-      vehicleData
-    );
+// export const saveNewVehicleAndUpdateUser = async (vehicleData, userEmail) => {
+//   try {
+//     const vehicleRef = await addDoc(
+//       collection(FirebaseDB, "vehicles"),
+//       vehicleData
+//     );
 
-    const userRef = doc(FirebaseDB, "users", userEmail);
-    await updateDoc(userRef, {
-      listings: arrayUnion(vehicleRef.id),
+//     const userRef = doc(FirebaseDB, "users", userEmail);
+//     await updateDoc(userRef, {
+//       listings: arrayUnion(vehicleRef.id),
+//     });
+
+//     getOwnedVehicles(userEmail);
+//     console.log("Vehicle created and user updated successfully!");
+//   } catch (error) {
+//     console.error("Error saving vehicle and updating user: ", error);
+//     throw error;
+//   }
+// };
+
+// export const saveVehicle = async (vehicleData) => {
+//   try {
+//     await addDoc(collection(FirebaseDB, "vehicles"), vehicleData);
+//     console.log("Vehicle created successfully!");
+//   } catch (error) {
+//     console.error("Error saving vehicle:", error);
+//     throw error;
+//   }
+// };
+
+export const saveVehicle = async (vehicle) => {
+  try {
+    const docRef = await addDoc(collection(FirebaseDB, "vehicles"), vehicle);
+    console.log("Vehicle created successfully!");
+
+    const generatedId = docRef.id;
+
+    await setDoc(doc(FirebaseDB, "vehicles", generatedId), {
+      ...vehicle,
+      id: generatedId,
     });
 
-    getOwnedVehicles(userEmail);
-    console.log("Vehicle created and user updated successfully!");
+    console.log("Vehicle ID updated successfully!");
   } catch (error) {
-    console.error("Error saving vehicle and updating user: ", error);
+    console.error("Error saving vehicle:", error);
     throw error;
   }
 };
 
-export const getOwnedVehicles = async (userEmail) => {
+export const updateVehicle = async (vehicle) => {
+  try {
+    await setDoc(doc(FirebaseDB, "vehicles", vehicle.id), vehicle);
+
+    showAlert("Success!", "Booking updated!");
+    console.log("Vehicle ID updated successfully!");
+  } catch (error) {
+    console.error("Error saving vehicle:", error);
+    throw error;
+  }
+};
+
+export const getOwnedVehicles = async (userEmail, setOwnedVehicles) => {
   try {
     let vehicles = [];
     const vehiclesRef = collection(FirebaseDB, "vehicles");
 
-    const q = query(vehiclesRef, where("owner", "==", userEmail));
+    const q = query(vehiclesRef, where("ownerEmail", "==", userEmail));
     const matchingVehicles = await getDocs(q);
 
     matchingVehicles.forEach((doc) => {
       vehicles.push(doc.data());
     });
-    console.log("DBActions.getOwnedVehicles: Owned vehicles retrieved");
-    return vehicles;
+    setOwnedVehicles(vehicles);
+    console.log("DBActions.getOwnedVehicles: Owned vehicles retrieved!");
   } catch (error) {
     console.log("Error retrieving owned vehicles");
     throw error;

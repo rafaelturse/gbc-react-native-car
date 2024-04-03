@@ -12,16 +12,20 @@ export const login = async (
 ) => {
   setLoading(true);
   try {
-    const response = await signInWithEmailAndPassword(
-      FirebaseAuth,
-      email,
-      password
-    );
-    const user = await getUser(response.user.email);
-    setUser(user);
-    pilot.navigate("Home");
+    const user = await getUser(email);
+    if (user) {
+      if (user.role === "owner") {
+        await signInWithEmailAndPassword(FirebaseAuth, email, password);
+        setUser(user);
+        pilot.navigate("Home");
+      } else {
+        setError("Error: User is not an 'owner'");
+      }
+    } else {
+      setError("Error: User not found");
+    }
   } catch (error) {
-    setError("Authentication error: Invalid credentials");
+    setError("Error: Invalid credentials");
   } finally {
     setLoading(false);
   }

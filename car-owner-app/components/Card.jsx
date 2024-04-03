@@ -1,10 +1,12 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Carousel from "./Carousel";
 import StyledButton from "./StyledButton";
 import { useNavigation } from "@react-navigation/native";
 import { useUserContext } from "../utils/UserContext";
 import { showAlert } from "../utils/showAlert";
+import { updateVehicle } from "../utils/DBActions";
+import CardBookingSection from "./CardBookingSection";
 
 const Card = ({ vehicle, mgmnt }) => {
   const pilot = useNavigation();
@@ -34,28 +36,14 @@ const Card = ({ vehicle, mgmnt }) => {
           </View>
         </View>
         {mgmnt ? (
-          vehicle.bookedBy == "" ? (
+          vehicle.bookedBy === null ? (
             <Text style={styles.notBooked}>Not booked</Text>
           ) : (
-            <View>
-              <Text style={styles.booked}>Booked by: {vehicle.bookedBy}</Text>
-              <View style={styles.buttonGroup}>
-                <StyledButton
-                  text="Accept"
-                  action={() => pilot.navigate("Post", vehicle)}
-                  accept
-                />
-                <StyledButton
-                  text="Reject"
-                  action={() => pilot.navigate("Post", vehicle)}
-                  reject
-                />
-              </View>
-            </View>
+            <CardBookingSection vehicle={vehicle} />
           )
         ) : (
           <StyledButton
-            text="Manual"
+            text="Select"
             action={
               user
                 ? () => pilot.navigate("Post", vehicle)
@@ -66,25 +54,6 @@ const Card = ({ vehicle, mgmnt }) => {
             }
           />
         )}
-        {/* {mgmnt ? (
-          <View style={styles.buttonGroup}>
-            <StyledButton
-              text="Accept"
-              action={() => pilot.navigate("Post", vehicle)}
-              accept
-            />
-            <StyledButton
-              text="Reject"
-              action={() => pilot.navigate("Post", vehicle)}
-              reject
-            />
-          </View>
-        ) : (
-          <StyledButton
-            text="Select"
-            action={() => pilot.navigate("Post", vehicle)}
-          />
-        )} */}
       </View>
     </View>
   );
