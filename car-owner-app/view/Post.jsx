@@ -1,11 +1,13 @@
-import { View, StyleSheet, Image, ScrollView } from "react-native";
+import { View, StyleSheet, Image, ScrollView, Text } from "react-native";
 import StyledButton from "../components/StyledButton";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import StyledTextInput from "../components/StyledTextInput";
 import Carousel from "../components/Carousel";
 import { useUserContext } from "../utils/UserContext";
-import { saveNewVehicleAndUpdateUser } from "../utils/DBActions";
+import { getOwnedVehicles, saveVehicle } from "../utils/DBActions";
+import { Vehicle } from "../models/Vehicle";
+import { useOwnedVehicleContext } from "../utils/OwnedVehicleContext";
 
 export default function Post() {
   const [name, setName] = useState();
@@ -16,14 +18,18 @@ export default function Post() {
   const [horsepower, setHorsepower] = useState();
   const [acceleration, setAcceleration] = useState();
   const [images, setImages] = useState();
+  const [address, setAddress] = useState();
+  const [price, setPrice] = useState();
+  const [licensePlate, setLicensePlate] = useState();
+  const [error, setError] = useState();
   const route = useRoute();
   const vehicle = route.params;
   const { user } = useUserContext();
   const pilot = useNavigation();
   const [loading, setLoading] = useState(false);
+  const { setOwnedVehicles } = useOwnedVehicleContext();
 
   useEffect(() => {
-    //If there is a vehicle prop, pre populate the fields
     vehicle &&
       (setImages(vehicle.images),
       setName(vehicle.name),
@@ -37,7 +43,25 @@ export default function Post() {
 
   const handleSubmit = () => {
     setLoading(true);
-    const newVehicle = {
+
+    if (
+      !name ||
+      !seats ||
+      !range ||
+      !year ||
+      !doors ||
+      !horsepower ||
+      !acceleration ||
+      !images ||
+      !address ||
+      !price
+    ) {
+      setError("Please fill in all fields");
+      setLoading(false);
+      return;
+    }
+
+    const newVehicle = new Vehicle({
       name: name,
       seats: seats,
       range: range,
@@ -46,10 +70,13 @@ export default function Post() {
       horsepower: horsepower,
       acceleration: acceleration,
       images: images,
-      owner: user.email,
-      bookedBy: "",
-    };
-    saveNewVehicleAndUpdateUser(newVehicle, user.email).then(() => {
+      address: address,
+      price: price,
+      ownerEmail: user.email,
+      ownerName: user.name,
+    });
+    saveVehicle(newVehicle.toPlainObject()).then(() => {
+      getOwnedVehicles(user.email, setOwnedVehicles);
       setLoading(false);
       pilot.navigate("Management");
     });
@@ -100,6 +127,18 @@ export default function Post() {
         onChangeText={setAcceleration}
         label="Acceleration"
       />
+      <StyledTextInput
+        value={address}
+        onChangeText={setAddress}
+        label="Address"
+      />
+      <StyledTextInput
+        value={licensePlate}
+        onChangeText={setLicensePlate}
+        label="License Plate"
+      />
+      <StyledTextInput value={price} onChangeText={setPrice} label="Price" />
+      {error ? <Text style={styles.error}>{error}</Text> : null}
       <StyledButton
         text={loading ? "Creating..." : "Submit"}
         action={handleSubmit}
@@ -130,5 +169,9 @@ const styles = StyleSheet.create({
   },
   spacer: {
     height: 50,
+  },
+  error: {
+    color: "red",
+    marginBottom: 10,
   },
 });

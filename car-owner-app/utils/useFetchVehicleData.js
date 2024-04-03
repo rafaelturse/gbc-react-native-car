@@ -19,18 +19,16 @@ const useFetchVehicleData = () => {
 
         const vehicleArray = data.map(
           (vehicle) =>
-            new Vehicle(
-              vehicle.acceleration,
-              vehicle.doors,
-              vehicle.horsepower,
-              vehicle.images,
-              `${vehicle.make} ${vehicle.model} ${vehicle.trim}`,
-              "",
-              vehicle.total_range,
-              vehicle.seats_max,
-              vehicle.model_year,
-              ""
-            )
+            new Vehicle({
+              acceleration: vehicle.acceleration,
+              doors: vehicle.doors,
+              horsepower: vehicle.horsepower,
+              images: vehicle.images,
+              name: `${vehicle.make} ${vehicle.model} ${vehicle.trim}`,
+              range: vehicle.total_range,
+              seats: vehicle.seats_max,
+              year: vehicle.model_year,
+            })
         );
 
         setVehicles(vehicleArray);
