@@ -8,7 +8,7 @@ import { useUserContext } from "../utils/UserContext";
 import { getOwnedVehicles, saveVehicle } from "../utils/DBActions";
 import { Vehicle } from "../models/Vehicle";
 import { useOwnedVehicleContext } from "../utils/OwnedVehicleContext";
-import { forwardGeocode } from "../utils/forwardGeocode";
+import { forward, reverse } from "../utils/geocoding";
 import { showAlert } from "../utils/showAlert";
 
 export default function Post() {
@@ -47,7 +47,8 @@ export default function Post() {
     setLoading(true);
 
     try {
-      const { lat, lon } = await forwardGeocode(address);
+      const { lat, lon } = await forward(address);
+      const city = await reverse(lat, lon);
 
       if (lat === undefined) {
         console.log("Geocoding failed");
@@ -57,6 +58,18 @@ export default function Post() {
       }
       if (lat === null) {
         console.log("Geocoding failed");
+        showAlert("Error", "error");
+        setLoading(false);
+        return;
+      }
+      if (city === undefined) {
+        console.log("Reverse Geocoding failed");
+        showAlert("Error", "Please input another address");
+        setLoading(false);
+        return;
+      }
+      if (lat === null) {
+        console.log(" Reverse Geocoding failed");
         showAlert("Error", "error");
         setLoading(false);
         return;
@@ -97,6 +110,7 @@ export default function Post() {
         ownerImage: user.url,
         lat: lat,
         lon: lon,
+        city: city,
       });
 
       await saveVehicle(newVehicle.toPlainObject());

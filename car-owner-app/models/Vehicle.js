@@ -23,6 +23,7 @@ export class Vehicle {
     id = null,
     renterName = null,
     renterImage = null,
+    city = null,
   }) {
     this.acceleration = acceleration;
     this.doors = doors;
@@ -47,6 +48,7 @@ export class Vehicle {
     this.id = id;
     this.renterName = renterName;
     this.renterImage = renterImage;
+    this.city = city;
   }
   toPlainObject() {
     return {
@@ -73,6 +75,7 @@ export class Vehicle {
       id: this.id,
       renterName: this.renterName,
       renterIamge: this.renterImage,
+      city: this.city,
     };
   }
 }

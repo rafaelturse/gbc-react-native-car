@@ -65,22 +65,29 @@ const CardBookingSection = ({ vehicle }) => {
         <Text style={styles.info}>Plate: {vehicle.licensePlate}</Text>
       </View>
       {vehicle.bookedBy && (
-        <View style={styles.column}>
-          <View style={styles.rowCenter}>
-            <Image source={{ uri: vehicle.renterPhoto }} style={styles.image} />
-            <Text style={styles.subheader}>
-              {vehicle.renterName ? vehicle.renterName : "N/A"}
+        <View style={styles.row}>
+          <View style={styles.column}>
+            <View style={styles.rowStart}>
+              <Image
+                source={{ uri: vehicle.renterPhoto }}
+                style={styles.image}
+              />
+              <Text style={styles.subheader}>
+                {vehicle.renterName ? vehicle.renterName : "N/A"}
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.column}>
+            <Text style={styles.info}>
+              Date: {vehicle.futureDate ? vehicle.futureDate : "N/A"}
+            </Text>
+            <Text style={styles.info}>
+              Code: {vehicle.bookedCode ? vehicle.bookedCode : "N/A"}
             </Text>
           </View>
-          <Text style={styles.info}>
-            Date: {vehicle.futureDate ? vehicle.futureDate : "N/A"}
-          </Text>
-          <Text style={styles.info}>
-            Confirmation code: {vehicle.bookedCode ? vehicle.bookedCode : "N/A"}
-          </Text>
         </View>
       )}
-
       {componentToRender}
     </View>
   );
@@ -97,7 +104,6 @@ const styles = StyleSheet.create({
   row: {
     display: "flex",
     flexDirection: "row",
-    width: "100%",
     marginBottom: 10,
     alignItems: "center",
     justifyContent: "space-around",
@@ -105,8 +111,7 @@ const styles = StyleSheet.create({
   column: {
     display: "flex",
     flexDirection: "column",
-    width: "100%",
-    alignItems: "flex-start",
+    flex: 1,
   },
   accepted: {
     fontSize: 22,
@@ -131,6 +136,7 @@ const styles = StyleSheet.create({
   },
   info: {
     fontSize: 16,
+    alignSelf: "center",
   },
   price: {
     color: "#14213d",
@@ -150,13 +156,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 9999,
   },
-  rowCenter: {
+  rowStart: {
     display: "flex",
     flexDirection: "row",
-    width: "100%",
-    marginBottom: 10,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     gap: 5,
+    alignSelf: "center",
   },
 });
