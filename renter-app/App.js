@@ -27,28 +27,5 @@ export default function App() {
       </NavigationContainer>
     </OwnedVehicleContextProvider>
   </UserContextProvider>
-    /*
-    <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen
-          name="Home"
-          component={Home}
-          options={{
-            tabBarIcon: ({ size, color }) => (
-              <MaterialCommunityIcons name="home" color={color} size={size} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Reservations" component={Reservations}
-          options={{
-            tabBarIcon: ({ size, color }) => (
-              <MaterialCommunityIcons name="star" color={color} size={size} />
-            ),
-          }}
-        />
-      </Tab.Navigator>
-    </NavigationContainer>
-    */
   )
 }
