@@ -8,11 +8,20 @@ const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen name="Main" component={Home} />
-        <Tab.Screen name="Reservations" component={Reservations} />
-      </Tab.Navigator>
-    </NavigationContainer>
-  );
+    <UserContextProvider>
+    <OwnedVehicleContextProvider>
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen
+            name="Main"
+            component={Main}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen name="Reservations" component={Reservations} />
+          <Stack.Screen name="Login" component={Login} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </OwnedVehicleContextProvider>
+  </UserContextProvider>
+  )
 }

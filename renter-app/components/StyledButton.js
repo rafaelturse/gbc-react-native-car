@@ -1,19 +1,22 @@
-import { Pressable, Text, StyleSheet } from "react-native";
+import { Pressable, Text, StyleSheet } from "react-native"
 
-const StyledButton = ({ text, action, secondary, auth }) => {
+const StyledButton = ({ text, action, secondary, small, accept, reject }) => {
   return (
     <Pressable
       style={[
         styles.button,
-        secondary && styles.alternateColor,
-        auth && { height: "auto", marginRight: 20 },
+        secondary && styles.secondaryStyles,
+        small && styles.smallStyles,
+        accept && styles.accept,
+        reject && styles.reject,
       ]}
       onPress={action && action}
     >
-      <Text style={[styles.buttonText, auth && { fontSize: 16 }]}>{text}</Text>
+      <Text style={[styles.buttonText, small && { fontSize: 16 }]}>{text}</Text>
     </Pressable>
-  );
-};
+  )
+}
+
 const styles = StyleSheet.create({
   button: {
     display: "flex",
@@ -37,10 +40,26 @@ const styles = StyleSheet.create({
     color: "#284b63",
     textAlign: "center",
   },
-  alternateColor: {
+  secondaryStyles: {
     shadowColor: "#fca311",
     borderColor: "#fca311",
+    marginBottom: 10,
   },
-});
+  smallStyles: {
+    height: "auto",
+    marginRight: 20,
+    flex: 0,
+  },
+  accept: {
+    flex: 1,
+    shadowColor: "#6a994e",
+    borderColor: "#6a994e",
+  },
+  reject: {
+    flex: 1,
+    shadowColor: "#bc4749",
+    borderColor: "#bc4749",
+  },
+})
 
-export default StyledButton;
+export default StyledButton
