@@ -8,6 +8,8 @@ import { useUserContext } from "../utils/UserContext";
 import { getOwnedVehicles, saveVehicle } from "../utils/DBActions";
 import { Vehicle } from "../models/Vehicle";
 import { useOwnedVehicleContext } from "../utils/OwnedVehicleContext";
+import { forwardGeocode } from "../utils/forwardGeocode";
+import { showAlert } from "../utils/showAlert";
 
 export default function Post() {
   const [name, setName] = useState();
@@ -41,45 +43,71 @@ export default function Post() {
       setAcceleration(vehicle.acceleration.toString()));
   }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setLoading(true);
 
-    if (
-      !name ||
-      !seats ||
-      !range ||
-      !year ||
-      !doors ||
-      !horsepower ||
-      !acceleration ||
-      !images ||
-      !address ||
-      !price
-    ) {
-      setError("Please fill in all fields");
-      setLoading(false);
-      return;
-    }
+    try {
+      const { lat, lon } = await forwardGeocode(address);
 
-    const newVehicle = new Vehicle({
-      name: name,
-      seats: seats,
-      range: range,
-      year: year,
-      doors: doors,
-      horsepower: horsepower,
-      acceleration: acceleration,
-      images: images,
-      address: address,
-      price: price,
-      ownerEmail: user.email,
-      ownerName: user.name,
-    });
-    saveVehicle(newVehicle.toPlainObject()).then(() => {
+      if (lat === undefined) {
+        console.log("Geocoding failed");
+        showAlert("Error", "Please input another address");
+        setLoading(false);
+        return;
+      }
+      if (lat === null) {
+        console.log("Geocoding failed");
+        showAlert("Error", "error");
+        setLoading(false);
+        return;
+      }
+
+      if (
+        !name ||
+        !seats ||
+        !range ||
+        !year ||
+        !doors ||
+        !horsepower ||
+        !acceleration ||
+        !images ||
+        !address ||
+        !price ||
+        !licensePlate
+      ) {
+        setError("Please fill in all fields");
+        setLoading(false);
+        return;
+      }
+
+      const newVehicle = new Vehicle({
+        name: name,
+        seats: seats,
+        range: range,
+        year: year,
+        doors: doors,
+        horsepower: horsepower,
+        acceleration: acceleration,
+        images: images,
+        address: address,
+        price: price,
+        licensePlate: licensePlate,
+        ownerEmail: user.email,
+        ownerName: user.name,
+        ownerImage: user.url,
+        lat: lat,
+        lon: lon,
+      });
+
+      await saveVehicle(newVehicle.toPlainObject());
+
       getOwnedVehicles(user.email, setOwnedVehicles);
       setLoading(false);
       pilot.navigate("Management");
-    });
+    } catch (error) {
+      console.error("Error:", error);
+      setLoading(false);
+    }
   };
 
   return (

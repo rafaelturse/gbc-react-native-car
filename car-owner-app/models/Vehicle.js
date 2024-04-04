@@ -10,6 +10,17 @@ export class Vehicle {
     year,
     ownerEmail = null,
     ownerName = null,
+    ownerImage = null,
+    bookedBy = null,
+    bookedCode = null,
+    futureDate = null,
+    price = null,
+    address = null,
+    licensePlate = null,
+    lat = null,
+    lon = null,
+    bookingStatus = null,
+    id = null,
   }) {
     this.acceleration = acceleration;
     this.doors = doors;
@@ -21,16 +32,17 @@ export class Vehicle {
     this.year = year;
     this.ownerEmail = ownerEmail;
     this.ownerName = ownerName;
-    this.bookedBy = null;
-    this.bookedCode = null;
-    this.futureDate = null;
-    this.price = null;
-    this.address = null;
-    this.licensePlate = null;
-    this.lat = null;
-    this.lon = null;
-    this.bookingStatus = null;
-    this.id = null;
+    this.ownerImage = ownerImage;
+    this.bookedBy = bookedBy;
+    this.bookedCode = bookedCode;
+    this.futureDate = futureDate;
+    this.price = price;
+    this.address = address;
+    this.licensePlate = licensePlate;
+    this.lat = lat;
+    this.lon = lon;
+    this.bookingStatus = bookingStatus;
+    this.id = id;
   }
   toPlainObject() {
     return {
@@ -44,6 +56,7 @@ export class Vehicle {
       year: this.year,
       ownerEmail: this.ownerEmail,
       ownerName: this.ownerName,
+      ownerImage: this.ownerImage,
       bookedBy: this.bookedBy,
       bookedCode: this.bookedCode,
       futureDate: this.futureDate,

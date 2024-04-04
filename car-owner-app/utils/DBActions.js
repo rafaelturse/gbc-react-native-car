@@ -118,7 +118,6 @@ export const updateVehicle = async (vehicle) => {
   try {
     await setDoc(doc(FirebaseDB, "vehicles", vehicle.id), vehicle);
 
-    showAlert("Success!", "Booking updated!");
     console.log("Vehicle ID updated successfully!");
   } catch (error) {
     console.error("Error saving vehicle:", error);

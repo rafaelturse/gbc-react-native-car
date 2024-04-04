@@ -17,7 +17,7 @@ export const login = async (
       if (user.role === "owner") {
         await signInWithEmailAndPassword(FirebaseAuth, email, password);
         setUser(user);
-        pilot.navigate("Home");
+        pilot.navigate("Main");
       } else {
         setError("Error: User is not an 'owner'");
       }
