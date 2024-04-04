@@ -6,7 +6,6 @@ import { getAllVehiclesByUserEmail } from "../data/vehicleDBActions"
 
 export default Reservations = () => {
 
-    const [loading, setLoading] = useState(true)
     const [reservations, setReservations] = useState([])
     const [refreshing, setRefreshing] = useState(false)
     const { user } = useUserContext()
