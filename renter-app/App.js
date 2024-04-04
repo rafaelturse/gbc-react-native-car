@@ -23,5 +23,5 @@ export default function App() {
       </NavigationContainer>
     </OwnedVehicleContextProvider>
   </UserContextProvider>
-  );
+  )
 }
