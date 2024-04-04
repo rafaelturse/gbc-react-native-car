@@ -32,10 +32,21 @@ const ReservationCard = ({ reservation }) => {
                 </View>
                 <View style={styles.containerSB}>
                     <Text style={styles.info}>
-                        (TODO) = photo 
-                        <Text style={styles.info}>{reservation.ownerName}</Text>
+                        <View style={styles.owner}>
+                            <View style={styles.contentH}>
+                                <View style={styles.contentV}>
+                                    <View style={styles.contentH}>
+                                        <Image source={{ uri: reservation.ownerImage }} style={styles.ownerImage} />
+                                        <View style={styles.contentV}>
+                                            <Text style={styles.subtext}>Owner</Text>
+                                            <Text style={styles.ownerName}>{reservation.ownerName}</Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            </View>
+                        </View>
                     </Text>
-                    <Text style={styles.status}>{ upper(reservation.bookingStatus)}</Text>
+                    <Text style={styles.status}>{upper(reservation.bookingStatus)}</Text>
                 </View>
             </View>
         </View>
@@ -56,6 +67,7 @@ const styles = StyleSheet.create({
     containerH: {
         flex: 1,
         flexDirection: "row",
+        marginBottom: 10,
     },
     containerC: {
         flex: 1,
@@ -77,6 +89,18 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
 
+    contentH: {
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        marginBottom: 5,
+    },
+
+    contentV: {
+        flexDirection: "column",
+        justifyContent: "center",
+        marginBottom: 5,
+    },
+
     /* CARD */
     card: {
         backgroundColor: "#fff",
@@ -92,10 +116,29 @@ const styles = StyleSheet.create({
     },
 
     /* ICON */
+    ownerImage: {
+        width: 50,
+        height: 50,
+        margin: 5,
+        borderWidth: 2,
+        borderRadius: 50,
+    },
+
+    /* ICON */
     thumbnail: {
         width: 250,
         height: 150,
         marginEnd: 20,
+    },
+
+    /* OWNER */
+    ownerName: {
+        fontSize: 26,
+        fontWeight: "bold",
+    },
+    owner: {
+        marginBottom: -10,
+        marginLeft: 10
     },
 
     /* TEXT */
@@ -112,6 +155,10 @@ const styles = StyleSheet.create({
     info: {
         fontSize: 14,
         marginBottom: 2,
+    },
+    subtext: {
+        bottom: -4,
+        fontSize: 10.
     },
     bold: { fontWeight: "bold" },
     status: {

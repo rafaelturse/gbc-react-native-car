@@ -1,15 +1,13 @@
-/* REACT */
 import { useState, useEffect } from "react"
 import { StyleSheet, View, Image, Text, Dimensions, TouchableOpacity, Animated } from "react-native"
-/* MAP */
+import { useNavigation } from "@react-navigation/native"
 import MapView, { Marker } from "react-native-maps"
 import * as Location from 'expo-location'
-/* CUSTOM */
 import { generateRandomFutureDate } from "../utils/dateUtils"
 import { primaryAlert } from "../utils/alertUtils"
 import StyledButton from "../components/StyledButton"
-/* DB */
-import { getAllVehicles, updateVehicle } from "../data/repository/vehicleDBActions"
+import { useUserContext } from "../utils/UserContext"
+import { getAllVehicles, updateVehicle } from "../data/vehicleDBActions"
 
 export default Home = () => {
 
@@ -19,6 +17,9 @@ export default Home = () => {
     const [vehicles, setVehicles] = useState([])
     const [selectedVehicle, setSelectedVehicle] = useState(null)
     const [cardAnimation] = useState(new Animated.Value(0))
+    const pilot = useNavigation()
+    const { user } = useUserContext()
+    const [refreshing, setRefreshing] = useState(false)
 
     const getCurrentLocation = async () => {
         try {
@@ -76,16 +77,30 @@ export default Home = () => {
     const reservation = (vehicle) => {
         console.log(`>>> INFO: Reservation process for - ${vehicle.name}`)
 
-        vehicle.bookingStatus = 'pending'
-        vehicle.bookedBy = 'John Johns' //TODO: get logged user
-        vehicle.futureDate = randomFutureDate
-        updateVehicle(vehicle)
+        if (user == null) {
+            primaryAlert(
+                'Access Denied!',
+                'You must be logged in!',
+                '>>> INFO: Log in redirecting!'
+            )
+            pilot.navigate("Login")
+        } else {
+            vehicle.bookingStatus = 'pending'
+            vehicle.bookedBy = user.email 
+            vehicle.futureDate = randomFutureDate
+            updateVehicle(vehicle)
 
-        primaryAlert(
-            'Success!',
-            'Reservation Booked. Wait for the approval before the booking can be confirmed!',
-            '>>> INFO: Reservation booked confirmation!'
-        )
+            primaryAlert(
+                'Success!',
+                'Reservation Booked. Wait for the approval before the booking can be confirmed!',
+                '>>> INFO: Reservation booked confirmation!'
+            )
+        }
+    }
+
+    const onRefresh = () => {
+        setRefreshing(true)
+        fetchVehicles().then(() => setRefreshing(false) )
     }
 
     useEffect(() => {
@@ -103,6 +118,7 @@ export default Home = () => {
                         latitudeDelta: 0.0922,
                         longitudeDelta: 0.0421,
                     }}
+                    onRegionChange={onRefresh}
                 >
                     {vehicles.length > 0 ? (
                         vehicles.map(
@@ -110,8 +126,7 @@ export default Home = () => {
                                 return (
                                     <Marker
                                         key={pos}
-                                        //coordinate={{ latitude: vehicle.lat, longitude: vehicle.lon }}
-                                        coordinate={{ latitude: "43.64299380867883", longitude: "-79.38701975667243" }}
+                                        coordinate={{ latitude: vehicle.lat, longitude: vehicle.lon }}
                                         onPress={() => handleMarkerPress(vehicle)}
                                     >
                                         <View style={styles.customMarker}>
@@ -133,14 +148,9 @@ export default Home = () => {
                 <Animated.View style={[styles.cardContainer, { transform: [{ translateY: cardAnimation.interpolate({ inputRange: [0, 1], outputRange: [400, 0] }) }] }]}>
 
                     <View style={styles.card}>
-                        <TouchableOpacity onPress={closeCard}>
+                        <TouchableOpacity style={styles.touchClose} onPress={closeCard}>
                             <Image source={require("../assets/close.png")} style={styles.cardClose} />
                         </TouchableOpacity>
-                        <View style={styles.contentEndH}>
-                            {/* TODO: change for user photo*/}
-                            <Text style={styles.info}>Renter: {selectedVehicle.ownerName}</Text>
-                            <Image source={require("../assets/marker.png")} style={styles.cardImage} />
-                        </View>
                         <Text style={styles.description}>{selectedVehicle.year}</Text>
                         <Text style={styles.title}>{selectedVehicle.name}</Text>
                         <View style={[styles.contentCenterH, styles.cardVehicle]}>
@@ -151,6 +161,19 @@ export default Home = () => {
                         <View style={[styles.contentCenterH, styles.cardVehicle]}>
                             <Text style={styles.info}>- Acceleration: {selectedVehicle.acceleration}</Text>
                             <Text style={styles.info}>- Horse Power: {selectedVehicle.horsepower}</Text>
+                        </View>
+                        <View style={styles.owner}>
+                            <View style={styles.contentH}>
+                                <View style={styles.contentV}>
+                                    <View style={styles.contentH}>
+                                        <Image source={{ uri: selectedVehicle.ownerImage }} style={styles.cardImage} />
+                                        <View style={styles.contentV}>
+                                            <Text style={styles.subtext}>Owner</Text>
+                                            <Text style={styles.ownerName}>{selectedVehicle.ownerName}</Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            </View>
                         </View>
                         <View style={styles.contentCenterH}>
                             <Image source={{ uri: selectedVehicle.images[0].url_thumbnail }} style={styles.cardVehicleImage} />
@@ -182,6 +205,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         marginBottom: 5,
     },
+
     contentCenterV: {
         flexDirection: "column",
         alignItems: "center",
@@ -189,11 +213,29 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
 
-    contentEndH: {
+    contentH: {
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        marginBottom: 5,
+    },
+
+    contentV: {
+        flexDirection: "column",
+        justifyContent: "center",
+        marginBottom: 5,
+    },
+
+    contentEnd: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "flex-end",
+        justifyContent: "flex-start",
         marginBottom: 5,
+    },
+
+    owner: {
+        marginTop: 20,
+        marginBottom: -70,
+        marginLeft: 10
     },
 
     /* MARKER */
@@ -234,6 +276,7 @@ const styles = StyleSheet.create({
         paddingBottom: 30,
     },
     card: {
+        position: "relative",
         backgroundColor: "#fff",
         borderRadius: 16,
         padding: 12,
@@ -257,18 +300,28 @@ const styles = StyleSheet.create({
     cardImage: {
         width: 50,
         height: 50,
-        margin: 10,
+        margin: 5,
+        borderWidth: 2,
+        borderRadius: 50,
     },
     cardVehicleImage: {
-        width: width * .45,
-        height: height * 0.15,
+        marginLeft: 90,
+        width: width * .60,
+        height: height * 0.20,
     },
     cardClose: {
         width: 14,
         height: 14,
         resizeMode: "contain",
         alignSelf: 'flex-end',
-        marginBottom: 10
+        zIndex: 9,
+    },
+    touchClose: {
+        position: "absolute",
+        top: 10,
+        right: 10,
+        zIndex: 9,
+        backgroundColor: "#fff"
     },
     cardDate: {
         fontSize: 20,
@@ -277,10 +330,18 @@ const styles = StyleSheet.create({
 
     /* TEXT */
     description: { fontSize: 12 },
+    subtext: {
+        bottom: -4,
+        fontSize: 10.
+    },
     title: {
         fontSize: 26,
         fontWeight: "bold",
         marginBottom: 20
+    },
+    ownerName: {
+        fontSize: 26,
+        fontWeight: "bold",
     },
     info: {
         fontSize: 16,

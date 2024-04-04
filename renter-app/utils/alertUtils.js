@@ -9,3 +9,9 @@ export const primaryAlert = (title, message, log) => {
         )
     )
 }
+
+export const showAlert = (title, message, action) => {
+    Alert.alert(title, message, [{ text: "OK", onPress: action }], {
+        cancelable: false,
+    })
+}
