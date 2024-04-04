@@ -1,6 +1,5 @@
 import { db } from "../FirebaseDB"
 import { collection, doc, getDocs, setDoc, query, where } from "firebase/firestore"
-import { reverseGeocoding } from "../utils/locationUtils"
 
 export const getAllVehicles = async () => {
     let vehicles = []
@@ -23,17 +22,17 @@ export const getVehiclesByCity = async (city) => {
         const response = await getDocs(collection(db, "vehicles"))
 
         if (!response.empty) {
-            response.forEach((doc) => {         
+            response.forEach((doc) => {
                 if (city === doc.data().city) { vehicles.push(doc.data()) }
             })
 
             return vehicles
-        } else { 
-            console.error(">>> ERROR: No such document!") 
+        } else {
+            console.error(">>> ERROR: No such document!")
             return vehicles
         }
-    } catch (e) { 
-        console.error(">>> ERROR: Error fetching document: ", e) 
+    } catch (e) {
+        console.error(">>> ERROR: Error fetching document: ", e)
         return vehicles
     }
 }
@@ -49,8 +48,8 @@ export const getAllVehiclesByUserEmail = async (email) => {
             response.forEach((doc) => { vehicles.push(doc.data()) })
 
             return vehicles
-        } else { 
-            console.error(">>> ERROR: No such document!") 
+        } else {
+            console.error(">>> ERROR: No such document!")
             return vehicles
         }
     } catch (e) { console.error(">>> ERROR: Error fetching document: ", e) }
@@ -58,7 +57,7 @@ export const getAllVehiclesByUserEmail = async (email) => {
 
 export const updateVehicle = async (vehicle) => {
     try {
-        await setDoc(doc(db, "vehicles", vehicle.id), vehicle )
+        await setDoc(doc(db, "vehicles", vehicle.id), vehicle)
         console.log(">>> INFO: Vehicle updated!")
     } catch (e) {
         console.error(">>> ERROR: Error updating vehicle:", e)
