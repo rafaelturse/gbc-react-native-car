@@ -1,16 +1,12 @@
-import { NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { UserContextProvider } from './utils/UserContext'
-import { OwnedVehicleContextProvider } from './utils/OwnedVehicleContext'
+import { NavigationContainer } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-import Reservations from './view/Reservations'
-import Main from './view/Main'
-import Login from "./view/Login"
+import Home from "./view/Home";
+import Reservations from "./view/Reservations";
 
-const Stack = createNativeStackNavigator()
+const Tab = createBottomTabNavigator();
 
 export default function App() {
-
   return (
     <UserContextProvider>
     <OwnedVehicleContextProvider>
@@ -27,28 +23,5 @@ export default function App() {
       </NavigationContainer>
     </OwnedVehicleContextProvider>
   </UserContextProvider>
-    /*
-    <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen
-          name="Home"
-          component={Home}
-          options={{
-            tabBarIcon: ({ size, color }) => (
-              <MaterialCommunityIcons name="home" color={color} size={size} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Reservations" component={Reservations}
-          options={{
-            tabBarIcon: ({ size, color }) => (
-              <MaterialCommunityIcons name="star" color={color} size={size} />
-            ),
-          }}
-        />
-      </Tab.Navigator>
-    </NavigationContainer>
-    */
-  )
+  );
 }

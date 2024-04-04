@@ -11,8 +11,9 @@ const CardBookingSection = ({ vehicle }) => {
   const handleVehicleUpdate = (status) => {
     vehicle.bookingStatus = status;
     status === "confirmed" && (vehicle.bookedCode = generateConfirmationCode());
-    updateVehicle(vehicle);
-    getOwnedVehicles(user.email, setOwnedVehicles);
+    updateVehicle(vehicle).then(() =>
+      getOwnedVehicles(user.email, setOwnedVehicles)
+    );
   };
 
   const generateConfirmationCode = () => {

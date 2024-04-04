@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { RefreshControl } from "react-native";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { useUserContext } from "../utils/UserContext";
 import { getOwnedVehicles } from "../utils/DBActions";
@@ -8,12 +9,20 @@ import { useOwnedVehicleContext } from "../utils/OwnedVehicleContext";
 export default function Management() {
   const { user } = useUserContext();
   const { ownedVehicles, setOwnedVehicles } = useOwnedVehicleContext();
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     getOwnedVehicles(user.email, setOwnedVehicles);
   }, []);
 
   useEffect(() => {}, [ownedVehicles]);
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    getOwnedVehicles(user.email, setOwnedVehicles).then(() =>
+      setRefreshing(false)
+    );
+  };
 
   return (
     <View style={styles.view}>
@@ -24,6 +33,13 @@ export default function Management() {
           data={ownedVehicles}
           renderItem={({ item }) => <Card vehicle={item} mgmnt />}
           style={styles.list}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["#007aff"]}
+            />
+          }
         />
       )}
     </View>

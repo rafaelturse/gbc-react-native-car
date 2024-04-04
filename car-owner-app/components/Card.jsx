@@ -5,7 +5,6 @@ import StyledButton from "./StyledButton";
 import { useNavigation } from "@react-navigation/native";
 import { useUserContext } from "../utils/UserContext";
 import { showAlert } from "../utils/showAlert";
-import { updateVehicle } from "../utils/DBActions";
 import CardBookingSection from "./CardBookingSection";
 
 const Card = ({ vehicle, mgmnt }) => {
