@@ -16,18 +16,15 @@ export const getAllVehicles = async () => {
     } catch (e) { console.error(">>> ERROR: Error fetching document: ", e) }
 }
 
-export const getVehiclesByLocation = async (location) => {
+export const getVehiclesByCity = async (city) => {
     let vehicles = []
 
     try {
         const response = await getDocs(collection(db, "vehicles"))
 
         if (!response.empty) {
-            response.forEach((doc) => { 
-                const userLocation = reverseGeocoding(location.lat, location.lon)
-                const vehicleLocation = reverseGeocoding(doc.data().lat, doc.data().lon)
-
-                if (userLocation.city === vehicleLocation.city) { vehicles.push(doc.data()) }
+            response.forEach((doc) => {         
+                if (city === doc.data().city) { vehicles.push(doc.data()) }
             })
 
             return vehicles

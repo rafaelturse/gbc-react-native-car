@@ -3,15 +3,16 @@ import { StyleSheet, View, Image, Text, Animated } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import MapView, { Marker } from "react-native-maps"
 import { useUserContext } from "../utils/UserContext"
-import { getVehiclesByLocation, updateVehicle } from "../data/vehicleDBActions"
+import { getVehiclesByCity, updateVehicle } from "../data/vehicleDBActions"
 import BottomModal from "../components/BottomModal"
 import { generateRandomFutureDate } from "../utils/dateUtils"
 import { showAlert } from "../utils/alertUtils"
-import { currentLocation } from "../utils/locationUtils"
+import { currentLocation, reverseGeocoding } from "../utils/locationUtils"
 
 export default Home = () => {
 
     const [deviceLocation, setDeviceLocation] = useState(null)
+    const [userCity, setUserCity] = useState(null)
     const [loading, setLoading] = useState(true)
     const [randomFutureDate, setRandomFutureDate] = useState()
     const [vehicles, setVehicles] = useState([])
@@ -25,6 +26,10 @@ export default Home = () => {
         try {
             const location = await currentLocation()
             setDeviceLocation(location)
+
+            const address = await reverseGeocoding(location.lat, location.lon)
+            setUserCity(address.city)
+
             setLoading(false)
         } catch (e) { 
             setLoading(false)
@@ -34,7 +39,7 @@ export default Home = () => {
 
     const fetchVehicles = async () => {
         try {
-            const vehicles = await getVehiclesByLocation(deviceLocation)
+            const vehicles = await getVehiclesByCity(userCity)
             setVehicles(vehicles)
         } catch (e) { console.error(">>> ERROR: Error fetching vehicles:", e) }
     }
