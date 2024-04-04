@@ -17,41 +17,40 @@ const Card = ({ vehicle, mgmnt }) => {
       <View style={styles.details}>
         <Text style={styles.name}>{vehicle.name}</Text>
         <View style={styles.line} />
-        <View style={styles.row}>
-          <View style={styles.column}>
-            <Text style={styles.info}>{`Seats: ${vehicle.seats}`}</Text>
-            <Text style={styles.info}>{`Range: ${vehicle.range}km`}</Text>
-            <Text style={styles.info}>{`Year: ${vehicle.year}`}</Text>
-          </View>
 
-          <View style={styles.column}>
-            <Text style={styles.info}>{`Doors: ${vehicle.doors}`}</Text>
-            <Text
-              style={styles.info}
-            >{`Horsepower: ${vehicle.horsepower}`}</Text>
-            <Text
-              style={styles.info}
-            >{`Acceleration: ${vehicle.acceleration}`}</Text>
-          </View>
-        </View>
         {mgmnt ? (
-          vehicle.bookedBy === null ? (
-            <Text style={styles.notBooked}>Not booked</Text>
-          ) : (
-            <CardBookingSection vehicle={vehicle} />
-          )
+          <CardBookingSection vehicle={vehicle} />
         ) : (
-          <StyledButton
-            text="Select"
-            action={
-              user
-                ? () => pilot.navigate("Post", vehicle)
-                : () =>
-                    showAlert("Access denied", "You must be logged in", () =>
-                      pilot.navigate("Login")
-                    )
-            }
-          />
+          <View>
+            <View style={styles.row}>
+              <View style={styles.column}>
+                <Text style={styles.info}>{`Seats: ${vehicle.seats}`}</Text>
+                <Text style={styles.info}>{`Range: ${vehicle.range}km`}</Text>
+                <Text style={styles.info}>{`Year: ${vehicle.year}`}</Text>
+              </View>
+
+              <View style={styles.column}>
+                <Text style={styles.info}>{`Doors: ${vehicle.doors}`}</Text>
+                <Text
+                  style={styles.info}
+                >{`Horsepower: ${vehicle.horsepower}`}</Text>
+                <Text
+                  style={styles.info}
+                >{`Acceleration: ${vehicle.acceleration}`}</Text>
+              </View>
+            </View>
+            <StyledButton
+              text="Select"
+              action={
+                user
+                  ? () => pilot.navigate("Post", vehicle)
+                  : () =>
+                      showAlert("Access denied", "You must be logged in", () =>
+                        pilot.navigate("Login")
+                      )
+              }
+            />
+          </View>
         )}
       </View>
     </View>
@@ -119,18 +118,6 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     gap: 10,
-  },
-  notBooked: {
-    fontSize: 22,
-    width: "100%",
-    textAlign: "center",
-    color: "#fca311",
-    marginVertical: 10,
-  },
-  booked: {
-    textAlign: "center",
-    fontSize: 16,
-    marginBottom: 5,
   },
 });
 

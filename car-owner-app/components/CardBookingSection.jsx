@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Image, StyleSheet, Text, View } from "react-native";
 import StyledButton from "./StyledButton";
 import { getOwnedVehicles, updateVehicle } from "../utils/DBActions";
 import { useUserContext } from "../utils/UserContext";
@@ -55,12 +55,32 @@ const CardBookingSection = ({ vehicle }) => {
       );
       break;
     default:
-      componentToRender = <View />;
+      componentToRender = <Text style={styles.notBooked}>Not booked</Text>;
   }
 
   return (
-    <View>
-      <Text style={styles.booked}>Booked by: {vehicle.bookedBy}</Text>
+    <View style={styles.column}>
+      <View style={styles.row}>
+        <Text style={styles.price}>${vehicle.price}</Text>
+        <Text style={styles.info}>Plate: {vehicle.licensePlate}</Text>
+      </View>
+      {vehicle.bookedBy && (
+        <View style={styles.column}>
+          <View style={styles.rowCenter}>
+            <Image source={{ uri: vehicle.renterPhoto }} style={styles.image} />
+            <Text style={styles.subheader}>
+              {vehicle.renterName ? vehicle.renterName : "N/A"}
+            </Text>
+          </View>
+          <Text style={styles.info}>
+            Date: {vehicle.futureDate ? vehicle.futureDate : "N/A"}
+          </Text>
+          <Text style={styles.info}>
+            Confirmation code: {vehicle.bookedCode ? vehicle.bookedCode : "N/A"}
+          </Text>
+        </View>
+      )}
+
       {componentToRender}
     </View>
   );
@@ -73,6 +93,20 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "row",
     gap: 10,
+  },
+  row: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
+    marginBottom: 10,
+    alignItems: "center",
+    justifyContent: "space-around",
+  },
+  column: {
+    display: "flex",
+    flexDirection: "column",
+    width: "100%",
+    alignItems: "flex-start",
   },
   accepted: {
     fontSize: 22,
@@ -88,9 +122,41 @@ const styles = StyleSheet.create({
     color: "#bc4749",
     marginVertical: 10,
   },
-  booked: {
+  notBooked: {
+    fontSize: 22,
+    width: "100%",
     textAlign: "center",
+    color: "#fca311",
+    marginVertical: 10,
+  },
+  info: {
     fontSize: 16,
-    marginBottom: 5,
+  },
+  price: {
+    color: "#14213d",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  subheader: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#14213d",
+    alignSelf: "center",
+  },
+  image: {
+    width: 50,
+    height: 50,
+    objectFit: "contain",
+    borderWidth: 2,
+    borderRadius: 9999,
+  },
+  rowCenter: {
+    display: "flex",
+    flexDirection: "row",
+    width: "100%",
+    marginBottom: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 5,
   },
 });
