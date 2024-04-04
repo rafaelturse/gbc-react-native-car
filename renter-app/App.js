@@ -1,15 +1,17 @@
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { NavigationContainer } from '@react-navigation/native'
+import { createNativeStackNavigator } from "@react-navigation/native-stack"
+import { UserContextProvider } from './utils/UserContext'
 
-import Home from "./view/Home";
-import Reservations from "./view/Reservations";
+import Reservations from './view/Reservations'
+import Main from './view/Main'
+import Login from "./view/Login"
 
-const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator()
 
 export default function App() {
+
   return (
     <UserContextProvider>
-    <OwnedVehicleContextProvider>
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen
@@ -21,7 +23,6 @@ export default function App() {
           <Stack.Screen name="Login" component={Login} />
         </Stack.Navigator>
       </NavigationContainer>
-    </OwnedVehicleContextProvider>
-  </UserContextProvider>
+    </UserContextProvider>
   )
 }
