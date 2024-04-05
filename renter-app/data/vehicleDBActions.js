@@ -37,7 +37,7 @@ export const getVehiclesByCity = async (city) => {
     }
 }
 
-export const getAllVehiclesByUserEmail = async (email) => {
+export const getAllVehiclesByUserEmail = async (email, setReservations) => {
     let vehicles = []
 
     try {
@@ -47,12 +47,15 @@ export const getAllVehiclesByUserEmail = async (email) => {
         if (!response.empty) {
             response.forEach((doc) => { vehicles.push(doc.data()) })
 
-            return vehicles
+            setReservations(vehicles)
         } else {
             console.error(">>> ERROR: No such document!")
-            return vehicles
+            setReservations(vehicles)
         }
-    } catch (e) { console.error(">>> ERROR: Error fetching document: ", e) }
+    } catch (e) { 
+        console.error(">>> ERROR: Error fetching document: ", e) 
+        setReservations(vehicles)
+    }
 }
 
 export const updateVehicle = async (vehicle) => {

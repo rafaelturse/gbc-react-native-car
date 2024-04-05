@@ -1,15 +1,15 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext } from "react"
 
-const ReservationsContext = createContext();
+const ReservationsContext = createContext()
 
 export const ReservationsContextProvider = ({ children }) => {
-  const [reservations, setReservations] = useState([]);
+  const [reservations, setReservations] = useState([])
 
   return (
     <ReservationsContext.Provider value={{ reservations, setReservations }}>
       {children}
     </ReservationsContext.Provider>
-  );
-};
+  )
+}
 
-export const useReservationsContext = () => useContext(ReservationsContext);
+export const useReservationsContext = () => useContext(ReservationsContext)

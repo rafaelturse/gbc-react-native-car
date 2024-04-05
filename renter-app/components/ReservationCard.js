@@ -31,21 +31,19 @@ const ReservationCard = ({ reservation }) => {
                     </View>
                 </View>
                 <View style={styles.containerSB}>
-                    <Text style={styles.info}>
-                        <View style={styles.owner}>
-                            <View style={styles.contentH}>
-                                <View style={styles.contentV}>
-                                    <View style={styles.contentH}>
-                                        <Image source={{ uri: reservation.ownerImage }} style={styles.ownerImage} />
-                                        <View style={styles.contentV}>
-                                            <Text style={styles.subtext}>Owner</Text>
-                                            <Text style={styles.ownerName}>{reservation.ownerName}</Text>
-                                        </View>
+                    <View style={styles.owner}>
+                        <View style={styles.contentH}>
+                            <View style={styles.contentV}>
+                                <View style={styles.contentH}>
+                                    <Image source={{ uri: reservation.ownerImage }} style={styles.ownerImage} />
+                                    <View style={styles.contentV}>
+                                        <Text style={styles.subtext}>Owner</Text>
+                                        <Text style={styles.ownerName}>{reservation.ownerName}</Text>
                                     </View>
                                 </View>
                             </View>
                         </View>
-                    </Text>
+                    </View>
                     <Text style={styles.status}>{upper(reservation.bookingStatus)}</Text>
                 </View>
             </View>
@@ -82,7 +80,6 @@ const styles = StyleSheet.create({
         justifyContent: "flex-end",
     },
     containerSB: {
-        flex: 1,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",

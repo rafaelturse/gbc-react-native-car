@@ -1,34 +1,30 @@
-import { useState, useEffect } from "react";
-import { StyleSheet, View, Text, FlatList, RefreshControl } from "react-native";
-import { useUserContext } from "../utils/UserContext";
-import ReservationCard from "../components/ReservationCard";
-import { getAllVehiclesByUserEmail } from "../data/vehicleDBActions";
-import { useReservationsContext } from "../utils/ReservationsContext";
+import { useState, useEffect } from "react"
+import { StyleSheet, View, Text, FlatList, RefreshControl } from "react-native"
+import { useUserContext } from "../utils/UserContext"
+import ReservationCard from "../components/ReservationCard"
+import { getAllVehiclesByUserEmail } from "../data/vehicleDBActions"
+import { useReservationsContext } from "../utils/ReservationsContext"
 
 export default Reservations = () => {
   const { reservations, setReservations } = useReservationsContext();
-  // const [reservations, setReservations] = useState([])
-  const [refreshing, setRefreshing] = useState(false);
-  const { user } = useUserContext();
+  const [refreshing, setRefreshing] = useState(false)
+  const { user } = useUserContext()
 
   const fetchReservations = async () => {
     try {
-      const reservations = await getAllVehiclesByUserEmail(user.email);
-      setReservations(reservations);
-      setRefreshing(false);
-    } catch (e) {
-      console.error(">>> ERROR: Error fetching reservations:", e);
-    }
-  };
+      await getAllVehiclesByUserEmail(user.email, setReservations)
+      setRefreshing(false)
+    } catch (e) { console.error(">>> ERROR: Error fetching reservations:", e) }
+  }
 
   const onRefresh = () => {
-    setRefreshing(true);
-    fetchReservations().then(() => setRefreshing(false));
-  };
+    setRefreshing(true)
+    fetchReservations().then(() => setRefreshing(false))
+  }
 
   useEffect(() => {
-    fetchReservations();
-  }, []);
+    fetchReservations()
+  }, [])
 
   useEffect(() => {}, [reservations]);
 
@@ -51,8 +47,8 @@ export default Reservations = () => {
         />
       )}
     </View>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   /* CONTENT */
@@ -66,4 +62,4 @@ const styles = StyleSheet.create({
     display: "flex",
     flexDirection: "column",
   },
-});
+})

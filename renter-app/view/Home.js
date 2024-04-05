@@ -3,14 +3,16 @@ import { StyleSheet, View, Image, Text, Animated } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import MapView, { Marker } from "react-native-maps"
 import { useUserContext } from "../utils/UserContext"
-import { getVehiclesByCity, updateVehicle } from "../data/vehicleDBActions"
+import { getAllVehiclesByUserEmail, getVehiclesByCity, updateVehicle } from "../data/vehicleDBActions"
 import BottomModal from "../components/BottomModal"
 import { generateRandomFutureDate } from "../utils/dateUtils"
 import { showAlert } from "../utils/alertUtils"
 import { currentLocation, reverseGeocoding } from "../utils/locationUtils"
+import { useReservationsContext } from "../utils/ReservationsContext"
 
 export default Home = () => {
 
+    const { setReservations } = useReservationsContext()
     const [deviceLocation, setDeviceLocation] = useState(null)
     const [userCity, setUserCity] = useState(null)
     const [loading, setLoading] = useState(true)
@@ -31,9 +33,9 @@ export default Home = () => {
             setUserCity(address.city)
 
             setLoading(false)
-        } catch (e) { 
+        } catch (e) {
             setLoading(false)
-            console.error(">>> ERROR: Error getting location:", e) 
+            console.error(">>> ERROR: Error getting location:", e)
         }
     }
 
@@ -82,13 +84,17 @@ export default Home = () => {
             vehicle.futureDate = randomFutureDate
             vehicle.renterName = user.name
             vehicle.renterPhoto = user.url
-            updateVehicle(vehicle)
+            updateVehicle(vehicle).then(() =>
+                getAllVehiclesByUserEmail(user.email, setReservations)
+            )
 
             showAlert(
                 'Success!',
                 'Reservation Booked. Wait for the approval before the booking can be confirmed!',
                 console.log('>>> INFO: Reservation booked confirmation!')
             )
+
+            closeCard()
         }
     }
 
